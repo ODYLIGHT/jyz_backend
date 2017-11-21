@@ -1,8 +1,8 @@
 defmodule JyzBackend.Guardian do
-  use Guardian, otp_app: :chat_with_me_backend
+  use Guardian, otp_app: :jyz_backend
     
-  alias ChatWithMeBackend.Repo
-  alias ChatWithMeBackend.User
+  alias JyzBackend.Repo
+  alias JyzBackend.User
       
   def subject_for_token(resource, _claims) do
     {:ok, to_string(resource.id)}

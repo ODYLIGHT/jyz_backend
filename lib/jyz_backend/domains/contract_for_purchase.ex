@@ -1,8 +1,8 @@
-defmodule JyzBackend.User do
+defmodule JyzBackend.ContractForPurchase do
     use Ecto.Schema
     use Arc.Ecto.Schema
     import Ecto.Changeset
-    alias JyzBackend.{User}
+    alias JyzBackend.{ContractForPurchase}
   
     schema "users" do
       field :username, :string

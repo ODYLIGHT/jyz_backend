@@ -24,8 +24,8 @@ config :logger, :console,
 
 # Configures Guardian
 config :jyz_backend, JyzBackend.Guardian,
-issuer: "jyz_backend",
-secret_key: "o5FtWVptxLYXJ8LIgSX0Bxkqfa0nwihIPHcfXeHDLAXlGQAjTF9Kh40Wp7rVUtp+"
+  issuer: "jyz_backend",
+  secret_key: "o5FtWVptxLYXJ8LIgSX0Bxkqfa0nwihIPHcfXeHDLAXlGQAjTF9Kh40Wp7rVUtp+"
 
 # Store uploaded file in local storage
 config :arc,
