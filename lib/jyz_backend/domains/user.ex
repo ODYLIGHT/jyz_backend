@@ -21,7 +21,7 @@ defmodule JyzBackend.User do
     @doc false
     def changeset(%User{} = user, attrs) do
       user
-        |> cast(attrs, [:username, :email, :password, :fullname, :is_admin])
+        |> cast(attrs, [:username, :email, :password, :fullname, :position, :is_admin, :active, :permissions])
         |> cast_attachments(attrs, [:avatar])
         |> validate_required([:username, :email, :is_admin])
         |> validate_format(:email, ~r/@/)

@@ -21,6 +21,25 @@ defmodule JyzBackendWeb.Router do
     post "/users", UserController, :new
     get "/users/username/:username", UserController, :checkUsername
     post "/login", LoginController, :login
+
+    
+  end
+
+  scope "/api/v1", JyzBackendWeb do
+    pipe_through [:api, :api_auth]
+
+    post "/users/avatar/:id", UserController, :setAvatar
+    delete "/users/:id", UserController, :delete
+    post "/users/:id", UserController, :update
+    post "/users/:id/activate", UserController, :activateUser
+
+    # 采购合同
+    get "/contract_for_purchase", ContractForPurchaseController, :index
+    get "/contract_for_purchase/:id", ContractForPurchaseController, :show
+    post "/contract_for_purchase", ContractForPurchaseController, :new
+    delete "/contract_for_purchase/:id", ContractForPurchaseController, :delete
+    post "/contract_for_purchase/:id", ContractForPurchaseController, :update
+
   end
 
 end

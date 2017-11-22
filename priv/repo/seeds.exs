@@ -19,6 +19,7 @@ admin =
     email: "admin@phx.com",
     fullname: "WangLei",
     position: "Administrator",
+    permissions: 255,
     active: true,
     is_admin: true
   }
@@ -29,6 +30,7 @@ user01 =
     password_hash: Comeonin.Pbkdf2.hashpwsalt("user01"),
     email: "user01@phx.com",
     fullname: "LiMing",
+    permissions: 240,
     active: true,
     is_admin: false
   }

@@ -1,5 +1,5 @@
 defmodule JyzBackend.Permissions do
-  use Guardian, otp_app: :chat_with_me_backend,
+  use Guardian, otp_app: :jyz_backend,
     permissions: %{
                       # 每组最大31个权限
                       default: [
@@ -7,15 +7,15 @@ defmodule JyzBackend.Permissions do
                         :public_profile, 
                         :user_about_me,
                         # 普通用户权限
-                        :somebody,
-                        :pet,
-                        :other,
+                        :list_something,
+                        :add_something,
+                        # 修改与审核权限
+                        :modify_something,
+                        :audit_something,
                         # 管理员权限
                         :all_users,
-                        :all_somebodies,
-                        :all_pets,
-                        :all_others,  
-                      ]  # 9个权限位，转换为十进制为511
+                        :all_something,
+                      ]  # 9个权限位，转换为十进制为255
   
                   }
   use Guardian.Permissions.Bitwise

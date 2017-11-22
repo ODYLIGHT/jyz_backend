@@ -29,12 +29,13 @@ defmodule JyzBackendWeb.UserController do
     end
   
     def new(conn, %{"user" => user_params}) do
-      user_changeset = User.changeset(%User{}, user_params)
+      # 新创建的用户active设置为false
+      user_changeset = User.changeset(%User{}, user_params |> Map.update("active", false, &(&1 and false)))
       case UserService.create(user_changeset) do
         {:ok, user} ->
           json conn, user
         {:error, changeset} ->
-          json conn, %{error: JyzWeb.ChangesetError.translate_changeset_errors(changeset.errors)}
+          json conn, %{error: JyzBackendWeb.ChangesetError.translate_changeset_errors(changeset.errors)}
       end
     end
   
@@ -109,6 +110,26 @@ defmodule JyzBackendWeb.UserController do
           case UserService.update(changeset) do
             {:ok, user} ->
               json conn, user |> Map.drop([:avatar, :password, :password_hash])
+            {:error, changeset} ->
+              json conn, %{error: JyzBackendWeb.ChangesetError.translate_changeset_errors(changeset.errors)}
+          end
+      end
+    end
+
+    # 激活用户,实现与修改用户相同
+    def activateUser(conn, %{"id" => id}) do 
+      # 判断是否具备权限
+      checkperm = Permissions.hasAllPermissions(conn, [:all_users])
+      case { checkperm, UserService.getById(id) } do
+        { false, _ } ->
+          json conn, %{error: "Unauthorized operation."}
+        { true, nil } ->
+          json conn , %{error: "can not find user."}
+        { true, user } ->
+          user_changeset = User.changeset(user, %{"active" => true})
+          case UserService.update(user_changeset) do
+            {:ok, user} ->
+              json conn, user
             {:error, changeset} ->
               json conn, %{error: JyzBackendWeb.ChangesetError.translate_changeset_errors(changeset.errors)}
           end
