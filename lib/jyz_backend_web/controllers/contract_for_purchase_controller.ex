@@ -22,12 +22,12 @@ defmodule JyzBackendWeb.ContractForPurchaseController do
       nil ->
         json conn, %{error: "can not find contract"}
       cfp ->
-        json conn, cfp |>ResolveAssociationRecursion.resolve_recursion_in_map(:contract_for_purchase_details, :contract_for_purchase)
+        json conn, cfp |> ResolveAssociationRecursion.resolve_recursion_in_map(:contract_for_purchase_details, :contract_for_purchase)
     end
   end
   
   def new(conn, %{"contractforpurchase" => cfp_params}) do
-    # 创建时，“已审核”（audited）字段设置为false,"创建人"（creater）字段设置为登录用户id
+    # 创建时，“已审核”（audited）字段设置为false
     cfp_changeset = ContractForPurchase.changeset(%ContractForPurchase{}, 
                                                     cfp_params 
                                                       |> Map.update("audited", false, &(&1 and false))

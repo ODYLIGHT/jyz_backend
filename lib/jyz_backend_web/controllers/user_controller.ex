@@ -1,6 +1,6 @@
 defmodule JyzBackendWeb.UserController do
     use JyzBackendWeb, :controller
-    alias JyzBackend.{User, UserService, Permissions}
+    alias JyzBackend.{User, UserService, Permissions, Guardian}
   
     def index(conn, params) do
       username = Map.get(params, "username", "")
@@ -28,6 +28,7 @@ defmodule JyzBackendWeb.UserController do
       end  
     end
   
+    # 创建用户激活状态一律为false
     def new(conn, %{"user" => user_params}) do
       # 新创建的用户active设置为false
       user_changeset = User.changeset(%User{}, user_params |> Map.update("active", false, &(&1 and false)))
@@ -52,16 +53,19 @@ defmodule JyzBackendWeb.UserController do
       end
     end
   
-    def update(conn, %{"id" => id, "user" => user_params}) do
-      # 判断是否具备权限
-      checkperm = Permissions.hasAllPermissions(conn, [:all_users])
-      case { checkperm, UserService.getById(id) } do
+    # 用户自己修改自己，无法修改激活状态，无法修改用户名
+    def update(conn, %{"user" => user_params}) do
+      user = Guardian.resource_from_conn(conn)
+      checkperm = Permissions.hasAllPermissions(conn, [:user_about_me])
+      case { checkperm, user } do
         { false, _ } ->
           json conn, %{error: "Unauthorized operation."}
         { true, nil } ->
           json conn , %{error: "can not find user."}
         { true, user } ->
-          user_changeset = User.changeset(user, user_params)
+          user_changeset = User.changeset(user, user_params 
+                                                  |> Map.update("active", user.active, fn(c) -> user.active end)
+                                                  |> Map.update("username", user.username, fn(c) -> user.username end))
           case UserService.update(user_changeset) do
             {:ok, user} ->
               json conn, user
@@ -69,6 +73,36 @@ defmodule JyzBackendWeb.UserController do
               json conn, %{error: JyzBackendWeb.ChangesetError.translate_changeset_errors(changeset.errors)}
           end
       end
+    end
+
+    # 用户修改密码,需要验证旧密码
+    def changePassword(conn, %{"old_password" => oldpwd, "new_password" => pwd}) do
+      user = Guardian.resource_from_conn(conn)
+      checkpwd = Comeonin.Pbkdf2.checkpw(oldpwd, user.password_hash)
+      checkperm = Permissions.hasAllPermissions(conn, [:user_about_me])
+
+      case checkpwd do
+        false ->
+          json conn, %{error: "The old password is wrong."}
+        true ->
+          case { checkperm, user } do
+            { false, _ } ->
+              json conn, %{error: "Unauthorized operation."}
+            { true, nil } ->
+              json conn , %{error: "can not find user."}
+            { true, user } ->
+              user_changeset = User.changeset(user, %{"password" => pwd})
+              case UserService.update(user_changeset) do
+                {:ok, user} ->
+                  json conn, user
+                {:error, changeset} ->
+                  json conn, %{error: JyzBackendWeb.ChangesetError.translate_changeset_errors(changeset.errors)}
+              end
+          end
+
+      end
+
+      
     end
   
     def show(conn, %{"id" => id}) do

@@ -32,6 +32,8 @@ defmodule JyzBackendWeb.Router do
     delete "/users/:id", UserController, :delete
     post "/users/:id", UserController, :update
     post "/users/:id/activate", UserController, :activateUser
+    post "/users/changepwd", UserController, :changePassword
+    
 
     # 采购合同
     get "/contract_for_purchase", ContractForPurchaseController, :index
