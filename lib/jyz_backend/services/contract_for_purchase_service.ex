@@ -2,7 +2,7 @@ defmodule JyzBackend.ContractForPurchaseService do
     use Ecto.Schema
     import Ecto.Query, only: [from: 2]
     import Ecto.Query.API, only: [like: 2]
-    alias JyzBackend.{ContractForPurchase, ContractForPurchaseDetail, Repo}
+    alias JyzBackend.{ContractForPurchase, ContractForPurchaseDetail, UserService, Repo}
   
     def page(cno \\ "", sort_field \\ "date", sort_direction \\ "desc", page \\ 1, page_size \\ 20) do 
   
@@ -18,7 +18,9 @@ defmodule JyzBackend.ContractForPurchaseService do
         
       cond do
         page.entries > 0 ->
-          %{page | entries: page.entries |> Enum.map(fn(u) -> Map.drop(u, [:contract_for_purchase_details]) end)}
+          %{page | entries: page.entries 
+                              |> Enum.map(fn(c) -> Map.drop(c, [:contract_for_purchase_details]) end)
+                              |> Enum.map(fn(c) -> Map.update("creater", "", &(UserService.getUsername(&1))) end)}
         true ->
           page
       end
@@ -26,9 +28,13 @@ defmodule JyzBackend.ContractForPurchaseService do
     end
     
     def getById(id) do
-      Repo.one from c in ContractForPurchase,
-        where: c.id == ^id,
-        preload: [:contract_for_purchase_details] 
+      c = Repo.one from c in ContractForPurchase,
+            where: c.id == ^id,
+            preload: [:contract_for_purchase_details] 
+      case c do
+        nil -> c
+        c -> c |> Map.update("creater", "", &(UserService.getUsername(&1)))
+      end
     end
   
     def create(changeset) do
@@ -44,4 +50,4 @@ defmodule JyzBackend.ContractForPurchaseService do
     end
   
   
-  end
+end

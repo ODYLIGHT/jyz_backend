@@ -39,5 +39,16 @@ defmodule JyzBackend.UserService do
     def getByName(name) do
       Repo.get_by(User, username: name)
     end
+
+    def getUsernameById(id) do
+      case Repo.get(User, id) do
+        nil -> ""
+        u -> u.username
+      end
+    end
+
+    def getUsernameById() do
+      ""
+    end
   
   end

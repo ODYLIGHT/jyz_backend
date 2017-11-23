@@ -1,7 +1,7 @@
 defmodule JyzBackend.ContractForPurchase do
   use Ecto.Schema
   import Ecto.Changeset
-  alias JyzBackend.{ContractForPurchase, ContractForPurchaseDetail}
+  alias JyzBackend.{User, ContractForPurchase, ContractForPurchaseDetail}
   
   schema "contract_for_purchase" do
     field :cno, :string
@@ -10,6 +10,10 @@ defmodule JyzBackend.ContractForPurchase do
     field :amount, :float
     field :partya, :string
     field :partyb, :string
+    field :audited, :boolean, default: false
+    field :audit_time, :string
+    field :audit_user, :string
+    field :create_user, :string
     has_many :contract_for_purchase_details, ContractForPurchaseDetail, on_delete: :delete_all, on_replace: :delete
     timestamps()
   end
@@ -17,7 +21,7 @@ defmodule JyzBackend.ContractForPurchase do
   @doc false
   def changeset(%ContractForPurchase{} = contractforpurchase, attrs) do
     contractforpurchase
-      |> cast(attrs, [:cno, :date, :location, :amount, :partya, :partyb])
+      |> cast(attrs, [:cno, :date, :location, :amount, :partya, :partyb, :audited, :audit_time, :audit_user, :create_user])
       |> validate_required([:cno, :date, :location, :amount, :partya, :partyb])
       |> unique_constraint(:cno)
       |> validate_length(:cno, min: 4)

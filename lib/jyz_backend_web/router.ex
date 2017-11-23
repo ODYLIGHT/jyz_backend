@@ -39,6 +39,7 @@ defmodule JyzBackendWeb.Router do
     post "/contract_for_purchase", ContractForPurchaseController, :new
     delete "/contract_for_purchase/:id", ContractForPurchaseController, :delete
     post "/contract_for_purchase/:id", ContractForPurchaseController, :update
+    get "/contract_for_purchase/audit/:id", ContractForPurchaseController, :audit
 
   end
 

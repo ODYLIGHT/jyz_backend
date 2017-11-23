@@ -19,4 +19,15 @@ defmodule JyzBackend.Guardian do
   def resource_from_claims(_claims) do
     {:error, :reason_for_error}
   end
+
+  # 从conn获取当前用户,url中必须token认证
+  def resource_from_conn(conn) do
+    conn.private.guardian_default_resource
+  end
+
+  # 从conn获取当前用户id,url中必须token认证
+  def resource_name_from_conn(conn) do
+    conn.private.guardian_default_resource.username
+  end
+
 end
