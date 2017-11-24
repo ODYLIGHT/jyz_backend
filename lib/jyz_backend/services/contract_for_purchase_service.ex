@@ -19,8 +19,7 @@ defmodule JyzBackend.ContractForPurchaseService do
       cond do
         page.entries > 0 ->
           %{page | entries: page.entries 
-                              |> Enum.map(fn(c) -> Map.drop(c, [:contract_for_purchase_details]) end)
-                              |> Enum.map(fn(c) -> Map.update("creater", "", &(UserService.getUsername(&1))) end)}
+                              |> Enum.map(fn(c) -> Map.drop(c, [:contract_for_purchase_details]) end)}
         true ->
           page
       end
@@ -28,13 +27,9 @@ defmodule JyzBackend.ContractForPurchaseService do
     end
     
     def getById(id) do
-      c = Repo.one from c in ContractForPurchase,
+      Repo.one from c in ContractForPurchase,
             where: c.id == ^id,
             preload: [:contract_for_purchase_details] 
-      case c do
-        nil -> c
-        c -> c |> Map.update("creater", "", &(UserService.getUsername(&1)))
-      end
     end
   
     def create(changeset) do
