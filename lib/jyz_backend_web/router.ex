@@ -15,7 +15,7 @@ defmodule JyzBackendWeb.Router do
 
   scope "/api/v1", JyzBackendWeb do
     pipe_through :api
-
+ 
     get "/users", UserController, :index
     get "/users/:id", UserController, :show
     post "/users", UserController, :new
@@ -42,6 +42,13 @@ defmodule JyzBackendWeb.Router do
     delete "/contract_for_purchase/:id", ContractForPurchaseController, :delete
     post "/contract_for_purchase/:id", ContractForPurchaseController, :update
     get "/contract_for_purchase/audit/:id", ContractForPurchaseController, :audit
+
+    #油品移库
+    get "/oil_transfer", OilTransferController, :index
+    get "/oil_transfer/:id", OilTransferController, :show
+    post "/oil_transfer", OilTransferController, :new
+    delete "/oil_transfer/:id", OilTransferController, :delete
+    post "/oil_transfer/:id", OilTransferController, :update
 
   end
 
