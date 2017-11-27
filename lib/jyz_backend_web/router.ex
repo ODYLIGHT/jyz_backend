@@ -43,6 +43,14 @@ defmodule JyzBackendWeb.Router do
     post "/contract_for_purchase/:id", ContractForPurchaseController, :update
     get "/contract_for_purchase/audit/:id", ContractForPurchaseController, :audit
 
+    
+    # 油品回罐
+    get "/metering_for_return", MeteringForReturnController, :index
+    get "/metering_for_return/:id", MeteringForReturnController, :show
+    post "/metering_for_return", MeteringForReturnController, :new
+    delete "/metering_for_return/:id", MeteringForReturnController, :delete
+    post "/metering_for_return/:id", MeteringForReturnController, :update
+    get "/metering_for_return/audit/:id", MeteringForReturnController, :audit
   end
 
 end
