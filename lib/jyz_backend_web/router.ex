@@ -50,6 +50,14 @@ defmodule JyzBackendWeb.Router do
     delete "/oil_transfer/:id", OilTransferController, :delete
     post "/oil_transfer/:id", OilTransferController, :update
 
+    #油品配送出库单
+    get "/dispatch_for_purchase", DispatchForPurchaseController, :index
+    get "/dispatch_for_purchase/:id", DispatchForPurchaseController, :show
+    post "/dispatch_for_purchase", DispatchForPurchaseController, :new
+    delete "/dispatch_for_purchase/:id", DispatchForPurchaseController, :delete
+    post "/dispatch_for_purchase/:id", DispatchForPurchaseController, :update
+    get "/dispatch_for_purchase/audit/:id", DispatchForPurchaseController, :audit
+
   end
 
 end
