@@ -67,6 +67,7 @@ defmodule JyzBackendWeb.ContractForPurchaseController do
   
   def update(conn, %{"id" => id, "contractforpurchase" => cfp_params}) do
 
+
     checkperm = Permissions.hasAllPermissions(conn, [:modify_something])
     case { checkperm, ContractForPurchaseService.getById(id) } do
       { false, _ } ->
@@ -93,6 +94,7 @@ defmodule JyzBackendWeb.ContractForPurchaseController do
           {:error, changeset} ->
             json conn, %{error: JyzBackendWeb.ChangesetError.translate_changeset_errors(changeset.errors)}
         end
+
     end
 
   end
