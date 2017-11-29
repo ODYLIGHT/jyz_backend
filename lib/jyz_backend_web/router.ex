@@ -3,7 +3,7 @@ defmodule JyzBackendWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
-    plug Corsica, origins: "*"
+    # plug Corsica, allow_headers: ["accept"], origins: "*"
   end
 
   pipeline :api_auth do  

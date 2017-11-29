@@ -22,6 +22,8 @@ defmodule JyzBackendWeb.Endpoint do
   plug Plug.RequestId
   plug Plug.Logger
 
+  plug JyzBackendWeb.CORS
+
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],

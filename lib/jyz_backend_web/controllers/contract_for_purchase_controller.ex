@@ -30,7 +30,7 @@ defmodule JyzBackendWeb.ContractForPurchaseController do
     # 创建时，“已审核”（audited）字段设置为false
     cfp_changeset = ContractForPurchase.changeset(%ContractForPurchase{}, 
                                                     cfp_params 
-                                                      |> Map.update("audited", false, &(&1 and false))
+                                                      |> Map.update("audited", false, fn(a) -> false end)
                                                       |> Map.update("create_user", Guardian.resource_name_from_conn(conn), fn(c) -> Guardian.resource_name_from_conn(conn) end))
     case Map.get(cfp_params, "details") do
       nil ->
