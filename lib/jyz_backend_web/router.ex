@@ -69,6 +69,13 @@ defmodule JyzBackendWeb.Router do
     post "/metering_for_return/:id", MeteringForReturnController, :update
     get "/metering_for_return/audit/:id", MeteringForReturnController, :audit
 
+    #仓库信息
+    get "/oil_depot", OilDepotController, :index
+    get "/oil_depot/:id", OilDepotController, :show
+    post "/oil_depot", OilDepotController, :new
+    delete "/oil_depot/:id", OilDepotController, :delete
+    post "/oil_depot/:id", OilDepotController, :update
+
   end
 
 end
