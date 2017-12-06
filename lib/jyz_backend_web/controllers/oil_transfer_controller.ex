@@ -25,7 +25,10 @@ defmodule JyzBackendWeb.OilTransferController do
     end
     
     def new(conn, %{"oiltransfer" => ot_params}) do #增加
-      ot_changeset = OilTransfer.changeset(%OilTransfer{}, ot_params)
+       # 创建时，“已审核”（audited）字段设置为false
+       ot_changeset = OilTransfer.changeset(%OilTransfer{}, ot_params 
+              |> Map.update("audited", false, &(&1 and false))
+              |> Map.update("create_user", Guardian.resource_name_from_conn(conn), fn(c) -> Guardian.resource_name_from_conn(conn) end))
       case Map.get(ot_params, "details") do
         nil ->
           details = []

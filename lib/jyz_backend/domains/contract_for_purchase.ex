@@ -10,10 +10,10 @@ defmodule JyzBackend.ContractForPurchase do
     field :amount, :float
     field :partya, :string
     field :partyb, :string
-    field :audited, :boolean, default: false
-    field :audit_time, :string
-    field :audit_user, :string
-    field :create_user, :string
+    field :audited, :boolean, default: false #审核状态
+    field :audit_time, :string               #审核时间
+    field :audit_user, :string               #审核人
+    field :create_user, :string              #创建人
     has_many :contract_for_purchase_details, ContractForPurchaseDetail, on_delete: :delete_all, on_replace: :delete
     timestamps()
   end

@@ -50,6 +50,7 @@ defmodule JyzBackendWeb.Router do
     post "/oil_transfer", OilTransferController, :new
     delete "/oil_transfer/:id", OilTransferController, :delete
     post "/oil_transfer/:id", OilTransferController, :update
+    get "/oil_transfer/audit/:id", OilTransferController, :audit
 
     #油品配送出库单
     get "/dispatch_for_purchase", DispatchForPurchaseController, :index
@@ -77,5 +78,16 @@ defmodule JyzBackendWeb.Router do
     post "/oil_depot/:id", OilDepotController, :update
 
   end
+
+  # scope "/api/v1", JyzBackendWeb do
+  #   pipe_through :api
+
+  #   get "oil_depot",OilDepotController, :index
+  #   get "oil_depot/:id",OilDepotController, :show
+  #   post "oil_depot",OilDepotController, :new
+  #   delete "oil_depot/:id",OilDepotController, :delete
+  #   post "oil_depot/:id",OilDepotController, :update
+    
+  # end
 
 end
