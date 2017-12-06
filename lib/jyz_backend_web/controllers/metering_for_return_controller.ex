@@ -28,9 +28,9 @@ defmodule JyzBackendWeb.MeteringForReturnController do
   def new(conn, %{"meteringforreturn" => cfp_params}) do
     # 创建时，“已审核”（audited）字段设置为false
     cfp_changeset = MeteringForReturn.changeset(%MeteringForReturn{}, 
-                                                cfp_params
-                                                |> Map.update("audited", false, &(&1 and false))
-                                                |> Map.update("create_user", Guardian.resource_name_from_conn(conn), fn(c) -> Guardian.resource_name_from_conn(conn) end))
+                                                cfp_params 
+                                                      |> Map.update("audited", false, fn(a) -> false end)
+                                                      |> Map.update("create_user", Guardian.resource_name_from_conn(conn), fn(c) -> Guardian.resource_name_from_conn(conn) end))
     case Map.get(cfp_params, "details") do
       nil ->
         details = []
@@ -64,27 +64,42 @@ defmodule JyzBackendWeb.MeteringForReturnController do
     end
   end
   
-def update(conn, %{"id" => id, "meteringforreturn" => cfp_params}) do
+ def update(conn, %{"id" => id, "meteringforreturn" => cfp_params}) do
 
-    cfp = MeteringForReturnService.getById(id)
-    cfp_changeset = MeteringForReturn.changeset(cfp, cfp_params)
-    details = Map.get(cfp_params, "details") 
-    case details do
-      nil ->
-        details = []
-      details ->
-        details = details |> Enum.map(fn(m) -> MeteringForReturnDetail.changeset(%MeteringForReturnDetail{}, m) end)
-    end
-    cfp_with_details = Ecto.Changeset.put_assoc(cfp_changeset, :metering_for_return_details, details)
-    case MeteringForReturnService.update(cfp_with_details) do
-      {:ok, cfp} ->
-        json conn, cfp |> Map.drop([:metering_for_return_details])
-      {:error, changeset} ->
-        json conn, %{error: JyzBackendWeb.ChangesetError.translate_changeset_errors(changeset.errors)}
+
+    checkperm = Permissions.hasAllPermissions(conn, [:modify_something])
+    case { checkperm, MeteringForReturnService.getById(id) } do
+      { false, _ } ->
+        json conn, %{error: "Unauthorized operation."}
+      { true, nil } ->
+        json conn , %{error: "Can not find MeteringForReturn"}
+      { true, cfp } ->
+        
+
+        cfp = MeteringForReturnService.getById(id)
+        cfp_changeset = MeteringForReturn.changeset(cfp, cfp_params 
+                                                         |> Map.update("audited", cfp.audited, fn(c) -> cfp.audited end)
+                                                         |> Map.update("audit_time", cfp.audit_time, fn(c) -> cfp.audit_time end)
+                                                         |> Map.update("audit_user", cfp.audit_user, fn(c) -> cfp.audit_user end)
+                                                         |> Map.update("create_user", cfp.create_user, fn(c) -> cfp.create_user end))
+        details = Map.get(cfp_params, "details") 
+        case details do
+          nil ->
+            details = []
+          details ->
+            details = details |> Enum.map(fn(m) -> MeteringForReturnDetail.changeset(%MeteringForReturnDetail{}, m) end)
+        end
+        cfp_with_details = Ecto.Changeset.put_assoc(cfp_changeset, :metering_for_return_details, details)
+        case MeteringForReturnService.update(cfp_with_details) do
+          {:ok, cfp} ->
+            json conn, cfp |> Map.drop([:metering_for_return_details])
+          {:error, changeset} ->
+            json conn, %{error: JyzBackendWeb.ChangesetError.translate_changeset_errors(changeset.errors)}
+        end
+
     end
 
   end
-
   # 油品回罐审核
   def audit(conn,  %{"id" => id}) do
     
