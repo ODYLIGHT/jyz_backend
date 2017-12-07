@@ -1,6 +1,7 @@
 defmodule JyzBackend.StockChange do
     use Ecto.Schema
     import Ecto.Changeset
+    alias JyzBackend.StockChange
     # alias JyzBackend.{User, ContractForPurchase, ContractForPurchaseDetail}
     
     schema "stock_change" do
@@ -9,7 +10,7 @@ defmodule JyzBackend.StockChange do
       field :model, :string        # 型号
       field :amount, :float        # 数量
       field :warehouse, :string    # 仓库
-      field :type, string          # 出入库类型
+      field :type, :string          # 出入库类型
       field :stockin, :boolean     # true：入库，false：出库
       field :calculated, :boolean  # true：已计算，false：未计算
 

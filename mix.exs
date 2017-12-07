@@ -53,7 +53,10 @@ defmodule JyzBackend.Mixfile do
       {:arc_ecto, "~> 0.7.0"},
       # CORS
       {:plug, "~> 1.0"},
-      {:corsica, "~> 1.0"}
+      {:corsica, "~> 1.0"},
+      # Cron-like job scheduler
+      {:quantum, ">= 2.2.0"},
+      {:timex, "~> 3.0"}
     ]
   end
 
