@@ -69,6 +69,22 @@ defmodule JyzBackendWeb.Router do
     post "/metering_for_return/:id", MeteringForReturnController, :update
     get "/metering_for_return/audit/:id", MeteringForReturnController, :audit
 
-  end
+    #油品入库校验单
+    get "/godownentry_for_acceptance", GodownentryForAcceptanceController, :index
+    get "/godownentry_for_acceptance/:id", GodownentryForAcceptanceController, :show
+    post "/godownentry_for_acceptance", GodownentryForAcceptanceController, :new
+    delete "/godownentry_for_acceptance/:id", GodownentryForAcceptanceController, :delete
+    post "/godownentry_for_acceptance/:id", GodownentryForAcceptanceController, :update
+    get "/godownentry_for_acceptance/audit/:id", GodownentryForAcceptanceController, :audit
+   
+   #油品销售提用表
+    get "/carry_for_account", CarryForAccountController, :index
+    get "/carry_for_account/:id", CarryForAccountController, :show
+    post "/carry_for_account", CarryForAccountController, :new
+    delete "/carry_for_account/:id", CarryForAccountController, :delete
+    post "/carry_for_account/:id", CarryForAccountController, :update
+    get "/carry_for_account/audit/:id", CarryForAccountController, :audit
+ 
+ end
 
 end

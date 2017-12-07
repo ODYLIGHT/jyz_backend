@@ -8,7 +8,7 @@ defmodule JyzBackendWeb.ContractForPurchaseController do
   def index(conn, params) do
 
     DateTimeHandler.getDateTime()
-    
+   IO.puts inspect DateTimeHandler.getDateTime()
     cno = Map.get(params, "cno", "")
     sort_field = Map.get(params, "sort_field", "date")
     sort_direction = Map.get(params, "sort_direction", "desc")
