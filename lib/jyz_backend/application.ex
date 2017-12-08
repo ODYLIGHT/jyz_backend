@@ -13,7 +13,8 @@ defmodule JyzBackend.Application do
       # Start the endpoint when the application starts
       supervisor(JyzBackendWeb.Endpoint, []),
       # Start your own worker by calling: JyzBackend.Worker.start_link(arg1, arg2, arg3)
-      # worker(JyzBackend.Worker, [arg1, arg2, arg3]),
+      worker(JyzBackend.Periodically, []),
+      worker(JyzBackend.Scheduler, []),
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

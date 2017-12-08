@@ -7,14 +7,15 @@ defmodule JyzBackendWeb.ContractForPurchaseController do
   
   def index(conn, params) do
 
-    DateTimeHandler.getDateTime()
-    
+    # DateTimeHandler.getDateTime()
+    # IO.puts inspect DateTimeHandler.getDateTime()
     cno = Map.get(params, "cno", "")
+    audited = Map.get(params, "audited", "")
     sort_field = Map.get(params, "sort_field", "date")
     sort_direction = Map.get(params, "sort_direction", "desc")
     page = Map.get(params, "page", 1)
     page_size = Map.get(params, "page_size", 20)
-    json conn, ContractForPurchaseService.page(cno,sort_field,sort_direction,page,page_size) 
+    json conn, ContractForPurchaseService.page(cno, audited, sort_field,sort_direction,page,page_size) 
   end
   
   def show(conn, %{"id" => id}) do

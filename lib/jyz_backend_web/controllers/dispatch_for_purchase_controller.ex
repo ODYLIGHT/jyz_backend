@@ -8,6 +8,8 @@ defmodule JyzBackendWeb.DispatchForPurchaseController do
   def index(conn, params) do
     DateTimeHandler.getDateTime()
     billno = Map.get(params, "billno", "")
+    # date = Map.get(params, "date", "")
+    # audited = Map.get(params, "audited", "")
     sort_field = Map.get(params, "sort_field", "date")
     sort_direction = Map.get(params, "sort_direction", "desc")
     page = Map.get(params, "page", 1)
@@ -28,7 +30,7 @@ defmodule JyzBackendWeb.DispatchForPurchaseController do
   def new(conn, %{"dispatchforpurchase" => cfp_params}) do
     cfp_changeset = DispatchForPurchase.changeset(%DispatchForPurchase{}, 
                                                     cfp_params 
-                                                      |> Map.update("audited", false, &(&1 and false))
+                                                      |> Map.update("audited", false,fn(a)->false end)
                                                       |> Map.update("create_user", Guardian.resource_name_from_conn(conn), fn(c) -> Guardian.resource_name_from_conn(conn) end))
     case Map.get(cfp_params, "details") do
       nil ->
@@ -66,21 +68,36 @@ defmodule JyzBackendWeb.DispatchForPurchaseController do
   def update(conn, %{"id" => id, "dispatchforpurchase" => cfp_params}) do
     # try do
 
-    cfp = DispatchForPurchaseService.getById(id)
-    cfp_changeset = DispatchForPurchase.changeset(cfp, cfp_params)
-    details = Map.get(cfp_params, "details") 
-    case details do
-      nil ->
-        details = []
-      details ->
-        details = details |> Enum.map(fn(m) -> DispatchForPurchaseDetail.changeset(%DispatchForPurchaseDetail{}, m) end)
-    end
+    checkperm = Permissions.hasAllPermissions(conn, [:modify_something])
+    case { checkperm, DispatchForPurchaseService.getById(id) } do
+      { false, _ } ->
+        json conn, %{error: "Unauthorized operation."}
+      { true, nil } ->
+        json conn , %{error: "Can not find DispatchForPurchase"}
+      { true, cfp } ->
+        
+
+        cfp = DispatchForPurchaseService.getById(id)
+        cfp_changeset = DispatchForPurchase.changeset(cfp, cfp_params 
+                                                         |> Map.update("audited", cfp.audited, fn(c) -> cfp.audited end)
+                                                         |> Map.update("audit_time", cfp.audit_time, fn(c) -> cfp.audit_time end)
+                                                         |> Map.update("audit_user", cfp.audit_user, fn(c) -> cfp.audit_user end)
+                                                         |> Map.update("create_user", cfp.create_user, fn(c) -> cfp.create_user end))
+        details = Map.get(cfp_params, "details") 
+        case details do
+          nil ->
+            details = []
+          details ->
+            details = details |> Enum.map(fn(m) -> DispatchForPurchaseDetail.changeset(%DispatchForPurchaseDetail{}, m) end)
+        end
         cfp_with_details = Ecto.Changeset.put_assoc(cfp_changeset, :dispatch_for_purchase_details, details)
-    case DispatchForPurchaseService.update(cfp_with_details) do
-      {:ok, cfp} ->
-        json conn, cfp |> Map.drop([:dispatch_for_purchase_details])
-      {:error, changeset} ->
-        json conn, %{error: JyzBackendWeb.ChangesetError.translate_changeset_errors(changeset.errors)}
+        case DispatchForPurchaseService.update(cfp_with_details) do
+          {:ok, cfp} ->
+            json conn, cfp |> Map.drop([:dispatch_for_purchase_details])
+          {:error, changeset} ->
+            json conn, %{error: JyzBackendWeb.ChangesetError.translate_changeset_errors(changeset.errors)}
+        end
+
     end
 
   end

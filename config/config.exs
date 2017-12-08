@@ -31,6 +31,17 @@ config :jyz_backend, JyzBackend.Guardian,
 config :arc,
 storage: Arc.Storage.Local
 
+# Cron scheduler
+config :jyz_backend, JyzBackend.Scheduler,
+jobs: [
+  # Every minute
+  {"* * * * *",      fn -> IO.puts("####call me every minute####") end},
+  # Every 15 minutes
+  {"*/15 * * * *",   fn -> IO.puts("####call me every 15 minute####") end},
+  # Runs on 18, 20, 22, 0, 2, 4, 6:
+  {"0 18-6/2 * * *", fn -> IO.puts("####call me every minute####") end}
+]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"
