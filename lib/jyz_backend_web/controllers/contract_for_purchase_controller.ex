@@ -84,13 +84,16 @@ defmodule JyzBackendWeb.ContractForPurchaseController do
                                                          |> Map.update("audit_user", cfp.audit_user, fn(c) -> cfp.audit_user end)
                                                          |> Map.update("create_user", cfp.create_user, fn(c) -> cfp.create_user end))
         details = Map.get(cfp_params, "details") 
+
         case details do
           nil ->
             details = []
           details ->
             details = details |> Enum.map(fn(m) -> ContractForPurchaseDetail.changeset(%ContractForPurchaseDetail{}, m) end)
         end
+
         cfp_with_details = Ecto.Changeset.put_assoc(cfp_changeset, :contract_for_purchase_details, details)
+        
         case ContractForPurchaseService.update(cfp_with_details) do
           {:ok, cfp} ->
             json conn, cfp |> Map.drop([:contract_for_purchase_details])

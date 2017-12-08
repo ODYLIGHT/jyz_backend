@@ -30,6 +30,11 @@ defmodule JyzBackend.OilTransferService do
         where: c.id == ^id,
         preload: [:oil_transfer_details] 
     end
+
+    # def  (audited) do
+    #   Repo.one from d in OilTransfer,
+    #    where: d.audited == ^audited
+    # end
   
     def create(changeset) do
       Repo.insert(changeset)

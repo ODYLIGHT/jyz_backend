@@ -1,11 +1,14 @@
 defmodule JyzBackendWeb.OilTransferController do
     use JyzBackendWeb, :controller
-    alias JyzBackend.{OilTransfer, OilTransferDetail, OilTransferService, 
-                        Repo, ResolveAssociationRecursion, Permissions}
+    alias JyzBackend.{OilTransfer, OilTransferDetail, OilTransferService, DateTimeHandler,
+                        Repo, ResolveAssociationRecursion, Permissions,Guardian}
     #alias Phoenix.ActionClauseErrorr
     use Ecto.Schema
-    
+
     def index(conn, params) do #查询
+
+      DateTimeHandler.getDateTime()
+      
       billno = Map.get(params, "billno", "")
       sort_field = Map.get(params, "sort_field", "date")
       sort_direction = Map.get(params, "sort_direction", "desc")
@@ -18,7 +21,7 @@ defmodule JyzBackendWeb.OilTransferController do
       case OilTransferService.getById(id) do
         nil ->
           json conn, %{error: "can not find 油品"}
-        ot ->
+        ot -> 
           IO.puts inspect ot
           json conn, ot |>ResolveAssociationRecursion.resolve_recursion_in_map(:oil_transfer_details, :oil_transfer)
       end
@@ -27,7 +30,7 @@ defmodule JyzBackendWeb.OilTransferController do
     def new(conn, %{"oiltransfer" => ot_params}) do #增加
        # 创建时，“已审核”（audited）字段设置为false
        ot_changeset = OilTransfer.changeset(%OilTransfer{}, ot_params 
-              |> Map.update("audited", false, &(&1 and false))
+              |> Map.update("audited", false,fn(a) -> false end )
               |> Map.update("create_user", Guardian.resource_name_from_conn(conn), fn(c) -> Guardian.resource_name_from_conn(conn) end))
       case Map.get(ot_params, "details") do
         nil ->
@@ -52,7 +55,7 @@ defmodule JyzBackendWeb.OilTransferController do
           json conn, %{error: "越权操作"}
         { true, nil } ->
           json conn , %{error: "Can not find 油品移库表"}
-        { true, c } ->
+        { true, c } ->         
           case OilTransferService.delete(c) do
             {:ok, c} ->
               json conn, c |> Map.drop([:oil_transfer_details])
@@ -62,30 +65,52 @@ defmodule JyzBackendWeb.OilTransferController do
       end
     end
     
-    def update(conn, %{"id" => id, "oiltransfer" => ot_params}) do #修改
-      ot = OilTransferService.getById(id)
-      ot_changeset = OilTransfer.changeset(ot, ot_params)
+    def update(conn, %{"id" => id, "oiltransfer" => ot_params}) do #修改   
+
+    # safe = Map.get("audited")
+    # case { safe, OilTransferService.getById(id) } do
+    #   {true, _ } ->
+    #     json conn,%{error: "Has been audited and can not be changed."}
+    # safe = OilTransferService.getAudited()
+    # case safe do
+    #   true ->
+    #     json conn,%{error: "Has been audited and can not be changed."}
+    #   end
+
+    checkperm = Permissions.hasAllPermissions(conn, [:modify_something])
+    case { checkperm, OilTransferService.getById(id) } do
+      { false, _ } ->
+        json conn, %{error: "Unauthorized operation."}
+      { true, nil } ->
+        json conn , %{error: "Can not find OilTransfer"}
+      { true, ot } ->
+
+        ot = OilTransferService.getById(id)
+        ot_changeset = OilTransfer.changeset(ot, ot_params 
+                                                         |> Map.update("audited", ot.audited, fn(c) -> ot.audited end)
+                                                         |> Map.update("audit_time", ot.audit_time, fn(c) -> ot.audit_time end)
+                                                         |> Map.update("audit_user", ot.audit_user, fn(c) -> ot.audit_user end)
+                                                         |> Map.update("create_user", ot.create_user, fn(c) -> ot.create_user end))
+     
+
       details = Map.get(ot_params,"details")
       case details do
         nil ->
           details = []
-        details
+        details ->
           details = details |> Enum.map(fn(m) -> OilTransferDetail.changeset(%OilTransferDetail{}, m) end)
       end
-          ot_with_details = Ecto.Changeset.put_assoc(ot_changeset, :oil_transfer_details, details)
+
+      ot_with_details = Ecto.Changeset.put_assoc(ot_changeset, :oil_transfer_details, details)
       case OilTransferService.update(ot_with_details) do
         {:ok, ot} ->
           json conn, ot |> Map.drop([:oil_transfer_details])
         {:error, changeset} ->
           json conn |> put_status(500), %{error: JyzBackendWeb.ChangesetError.translate_changeset_errors(changeset.errors)}
-      end
-  
-      # rescue
-      #   e -> json conn , %{error: "########################"}
-      # catch
-      #   e -> json conn , %{error: "########################"}
-      # end
-  
+       end
+
+     end
+
     end
   
     # 获取当前登录用户
@@ -102,12 +127,12 @@ defmodule JyzBackendWeb.OilTransferController do
       { false, _ } ->
         json conn, %{error: "Unauthorized operation."}
       { true, nil } ->
-        json conn , %{error: "Can not find ContractForPurchase"}
+        json conn , %{error: "Can not find OilTransfer"}
       {true, c } ->
         case c.audited do
           false ->
-            cfp_changeset = OilTransfer.changeset(c, %{"audited" => true, "audit_time" => "#{DateTimeHandler.getDateTime()}", "audit_user" => Guardian.resource_name_from_conn(conn)})
-            case OilTransferService.update(cfp_changeset) do
+            ot_changeset = OilTransfer.changeset(c, %{"audited" => true, "audit_time" => "#{DateTimeHandler.getDateTime()}", "audit_user" => Guardian.resource_name_from_conn(conn)})
+            case OilTransferService.update(ot_changeset) do
               {:ok, c} ->
                 json conn, c |> Map.drop([:oil_transfer_details])
               {:error, changeset} ->
