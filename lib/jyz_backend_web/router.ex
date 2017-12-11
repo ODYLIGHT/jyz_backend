@@ -77,7 +77,6 @@ defmodule JyzBackendWeb.Router do
     delete "/oil_depot/:id", OilDepotController, :delete
     post "/oil_depot/:id", OilDepotController, :update
 
-  end
     #油品入库校验单
     get "/godownentry_for_acceptance", GodownentryForAcceptanceController, :index
     get "/godownentry_for_acceptance/:id", GodownentryForAcceptanceController, :show
