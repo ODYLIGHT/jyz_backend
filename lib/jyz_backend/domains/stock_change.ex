@@ -11,8 +11,8 @@ defmodule JyzBackend.StockChange do
       field :amount, :float        # 数量
       field :warehouse, :string    # 仓库
       field :type, :string          # 出入库类型
-      field :stockin, :boolean     # true：入库，false：出库
       field :calculated, :boolean  # true：已计算，false：未计算
+      field :cal_status, :boolean      # 计算状态，true：成功，false：失败
 
       timestamps()
     end
@@ -20,8 +20,8 @@ defmodule JyzBackend.StockChange do
     @doc false
     def changeset(%StockChange{} = stockchange, attrs) do
         stockchange
-        |> cast(attrs, [:cno, :date, :model, :amount, :warehouse, :type, :stockin, :calculated])
-        |> validate_required([:cno, :model, :amount, :warehouse, :type, :stockin, :calculated])
+        |> cast(attrs, [:cno, :date, :model, :amount, :warehouse, :type, :calculated, :cal_status])
+        |> validate_required([:cno, :model, :amount, :warehouse, :type, :calculated])
         |> validate_length(:cno, min: 4)
     end
  

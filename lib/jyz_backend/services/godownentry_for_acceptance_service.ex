@@ -1,8 +1,8 @@
 defmodule JyzBackend.GodownentryForAcceptanceService do
     use Ecto.Schema
     import Ecto.Query, only: [from: 2]
-    import Ecto.Query.API, only: [like: 2]
-    alias JyzBackend.{GodownentryForAcceptance, GodownentryForAcceptanceDetail, Repo}
+    alias JyzBackend.{GodownentryForAcceptance, GodownentryForAcceptanceDetail, OilDepotService, StockChange, StockChangeService, Repo}
+    alias Ecto.Multi
   
     def page( bno \\ "", sort_field \\ "cno", sort_direction \\ "desc", page \\ 1, page_size \\ 20) do 
   
@@ -39,6 +39,35 @@ defmodule JyzBackend.GodownentryForAcceptanceService do
     def update(changeset) do
       Repo.update(changeset)
     end
-  
-  
+
+    # 设置审核入库的整个过程在一个事务中,接受两个参数，入库校验单和入库校验单审核changeset
+    def auditStockIn(godown, changeset) do 
+      Repo.transaction(create_stock_change_from_godown(godown, changeset))
+    end
+
+    # 审核将通过所有明细，生成库存变化记录StockChange
+    defp create_stock_change_from_godown(godown_with_details, changeset) do
+      # 生成multi
+      multi = Multi.new
+      # 获得明细用以生成StockChange
+      details = godown_with_details.godownentry_for_acceptance_details
+      # 获取单号用以填充StockChange的cno字段
+      cno = godown_with_details.bno
+      # 由明细生成StockChange map的list
+      case details do
+        nil -> multi
+        details ->
+          change_sets = details 
+            
+            |> Enum.map(fn(d) -> %{cno: cno, date: "", model: d.oilname, amount: d.realquantity, warehouse: d.stockplace, type: "油品入库校验单", stockin: true, calculated: false} end)
+            # 将所有stockchange插入数据库
+            |> Enum.map(fn(m) -> sc =  StockChange.changeset(%StockChange{}, m) end)
+            |> Enum.with_index
+            |> Enum.reduce(multi, fn({ x, i }, acc) -> acc |> Multi.insert(Integer.to_string(i), x) end)
+          IO.puts inspect change_sets
+          change_sets
+          
+          change_sets |> Multi.update("audit", changeset)
+      end
+    end 
   end

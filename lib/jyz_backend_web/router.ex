@@ -22,6 +22,9 @@ defmodule JyzBackendWeb.Router do
     get "/users/username/:username", UserController, :checkUsername
     post "/login", LoginController, :login
 
+    # 查看库存变化量
+    get "/stock_change", StockChangeController, :index
+
     
   end
 
@@ -33,7 +36,6 @@ defmodule JyzBackendWeb.Router do
     post "/users/:id", UserController, :update
     post "/users/:id/activate", UserController, :activateUser
     post "/users/changepwd", UserController, :changePassword
-    
 
     # 采购合同
     get "/contract_for_purchase", ContractForPurchaseController, :index
@@ -42,7 +44,6 @@ defmodule JyzBackendWeb.Router do
     delete "/contract_for_purchase/:id", ContractForPurchaseController, :delete
     post "/contract_for_purchase/:id", ContractForPurchaseController, :update
     get "/contract_for_purchase/audit/:id", ContractForPurchaseController, :audit
-
 
     #油品移库
     get "/oil_transfer", OilTransferController, :index

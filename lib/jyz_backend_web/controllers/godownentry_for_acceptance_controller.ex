@@ -98,11 +98,11 @@ end
         case c.audited do
           false ->
             cfp_changeset = GodownentryForAcceptance.changeset(c, %{"audited" => true, "audit_time" => "#{DateTimeHandler.getDateTime()}", "audit_user" => Guardian.resource_name_from_conn(conn)})
-            case GodownentryForAcceptanceService.update(cfp_changeset) do
+            case GodownentryForAcceptanceService.auditStockIn(c, cfp_changeset) do
               {:ok, c} ->
-                json conn, c |> Map.drop([:godownentry_for_acceptance_details])
-              {:error, changeset} ->
-                json conn, %{error: JyzBackendWeb.ChangesetError.translate_changeset_errors(changeset.errors)}
+                json conn, c["audit"] |> Map.drop([:godownentry_for_acceptance_details])
+              {:error, _,_,_} ->
+                json conn, %{error: "Audit failed, please check details."}
             end
           true ->
             json conn , %{error: "GodownentryForAcceptance has already been audited."}
