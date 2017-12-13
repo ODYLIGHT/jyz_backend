@@ -43,5 +43,9 @@ defmodule JyzBackend.OilDepotService do
       Repo.update(changeset)
     end
   
+    def getByName(name) do
+      Repo.one from c in OilDepot,
+      where: c.depotname == ^name
+    end
   
   end

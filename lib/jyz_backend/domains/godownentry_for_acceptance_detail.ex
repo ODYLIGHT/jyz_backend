@@ -9,7 +9,7 @@ defmodule JyzBackend.GodownentryForAcceptanceDetail do
       field :realquantity, :float #实际采购量
       field :price, :float        #入库单价
       field :totalprice, :float   #入库金额
-      field :stockplace, :integer #入库地
+      field :stockplace, :string  #入库地
       field :comment, :string     #备注
       # 这里，ECTO将使用cfp_id作为外键列名
       belongs_to :godownentry_for_acceptance, GodownentryForAcceptance, on_replace: :delete

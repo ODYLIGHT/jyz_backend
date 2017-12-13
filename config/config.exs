@@ -35,11 +35,11 @@ storage: Arc.Storage.Local
 config :jyz_backend, JyzBackend.Scheduler,
 jobs: [
   # Every minute
-  {"* * * * *",      fn -> IO.puts("####call me every minute####") end},
+  {"* * * * *",      fn -> 0 end},
   # Every 15 minutes
   {"*/15 * * * *",   fn -> IO.puts("####call me every 15 minute####") end},
   # Runs on 18, 20, 22, 0, 2, 4, 6:
-  {"0 18-6/2 * * *", fn -> IO.puts("####call me every minute####") end}
+  {"0 18-6/2 * * *", fn -> 0 end}
 ]
 
 # Import environment specific config. This must remain at the bottom
