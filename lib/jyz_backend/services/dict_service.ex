@@ -4,7 +4,9 @@ defmodule JyzBackend.DictService do
     alias JyzBackend.{Dict, Repo}
   
     def create(changeset) do
-      Repo.insert(changeset)
+      d = Repo.insert(changeset)
+      flushDict() 
+      d
     end
     
     def page(code \\ "", sort_field \\ "seq", sort_direction \\ "asc", page \\ 1, page_size \\ 20) do 
@@ -23,11 +25,15 @@ defmodule JyzBackend.DictService do
     end
   
     def delete(dict) do
-      Repo.delete!(dict) 
+      d = Repo.delete!(dict) 
+      flushDict() 
+      d
     end
   
     def update(changeset) do
-      Repo.update(changeset)
+      d = Repo.update(changeset)
+      flushDict()
+      d
     end
   
     def getById(id) do
@@ -37,5 +43,17 @@ defmodule JyzBackend.DictService do
     # def getByName(name) do
     #   Repo.get_by(User, username: name)
     # end
+
+    # 获取数据字典内容用以缓存
+    def getDictMap() do
+      Repo.all(Dict) 
+        |> Enum.reduce(%{}, fn(d, acc) -> acc |> Map.put(d.key, d.parm) end)
+    end
+
+    # 刷新内存中数据字典
+    def flushDict() do
+      m = getDictMap()
+      GenServer.cast(AppDict, {:set_dict, m})
+    end
   
-  end
+end

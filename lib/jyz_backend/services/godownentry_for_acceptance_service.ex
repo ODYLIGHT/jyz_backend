@@ -53,21 +53,23 @@ defmodule JyzBackend.GodownentryForAcceptanceService do
       details = godown_with_details.godownentry_for_acceptance_details
       # 获取单号用以填充StockChange的cno字段
       cno = godown_with_details.bno
+
+      # 获取StockChange类型，这里是油品入库校验
+      m = GenServer.call(Globalvs, :get_dict)
+      itype = m.stockchange_type_godownentry
+      
       # 由明细生成StockChange map的list
       case details do
         nil -> multi
         details ->
-          change_sets = details 
+          details 
             
-            |> Enum.map(fn(d) -> %{cno: cno, date: "", model: d.oilname, amount: d.realquantity, warehouse: d.stockplace, type: "油品入库校验单", stockin: true, calculated: false} end)
+            |> Enum.map(fn(d) -> %{cno: cno, date: "", model: d.oilname, amount: d.realquantity, warehouse: d.stockplace, type: itype, stockin: true, calculated: false} end)
             # 将所有stockchange插入数据库
             |> Enum.map(fn(m) -> sc =  StockChange.changeset(%StockChange{}, m) end)
             |> Enum.with_index
             |> Enum.reduce(multi, fn({ x, i }, acc) -> acc |> Multi.insert(Integer.to_string(i), x) end)
-          IO.puts inspect change_sets
-          change_sets
-          
-          change_sets |> Multi.update("audit", changeset)
+            |> Multi.update("audit", changeset)
       end
     end 
   end
