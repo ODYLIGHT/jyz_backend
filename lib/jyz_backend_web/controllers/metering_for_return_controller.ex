@@ -6,14 +6,15 @@ defmodule JyzBackendWeb.MeteringForReturnController do
   use Ecto.Schema
   
   def index(conn, params) do
-    DateTimeHandler.getDateTime()
+   # DateTimeHandler.getDateTime()
     
     billno = Map.get(params, "billno", "")
+    audited = Map.get(params, "audited", "")
     sort_field = Map.get(params, "sort_field", "billdate")
     sort_direction = Map.get(params, "sort_direction", "desc")
     page = Map.get(params, "page", 1)
     page_size = Map.get(params, "page_size", 20)
-    json conn, MeteringForReturnService.page(billno,sort_field,sort_direction,page,page_size) 
+    json conn, MeteringForReturnService.page(billno,audited,sort_field,sort_direction,page,page_size) 
   end
   
   def show(conn, %{"id" => id}) do
