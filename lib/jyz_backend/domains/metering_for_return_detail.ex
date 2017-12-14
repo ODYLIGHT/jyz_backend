@@ -9,7 +9,7 @@ defmodule JyzBackend.MeteringForReturnDetail do
       field :oilname, :string
       field :unit, :string
       field :quantity, :float
-      field :stockplace, :float
+      field :stockplace, :string
       field :comment, :string
       # 这里，ECTO将使用cfp_id作为外键列名
       belongs_to :metering_for_return, MeteringForReturn, on_replace: :delete
