@@ -26,15 +26,17 @@ defmodule JyzBackendWeb.Router do
     get "/stock_change", StockChangeController, :index
 
     
+
+    
   end
 
   scope "/api/v1", JyzBackendWeb do
     pipe_through [:api, :api_auth]
-
+    post "/users/:id/activate", UserController, :activateUser
     post "/users/avatar/:id", UserController, :setAvatar
     delete "/users/:id", UserController, :delete
     post "/users/:id", UserController, :update
-    post "/users/:id/activate", UserController, :activateUser
+   
     post "/users/changepwd", UserController, :changePassword
 
     # 采购合同
@@ -78,7 +80,6 @@ defmodule JyzBackendWeb.Router do
     delete "/oil_depot/:id", OilDepotController, :delete
     post "/oil_depot/:id", OilDepotController, :update
 
-  
     #油品入库校验单
     get "/godownentry_for_acceptance", GodownentryForAcceptanceController, :index
     get "/godownentry_for_acceptance/:id", GodownentryForAcceptanceController, :show
@@ -95,6 +96,13 @@ defmodule JyzBackendWeb.Router do
     post "/carry_for_account/:id", CarryForAccountController, :update
     get "/carry_for_account/audit/:id", CarryForAccountController, :audit
  
+
+  #数据字典
+    get "/dict", DictController, :index
+    get "/dict/:id", DictController, :show
+    post "/dict", DictController, :new
+    delete "/dict/:id", DictController, :delete
+    post "/dict/:id", DictController, :update
  end
 
   # scope "/api/v1", JyzBackendWeb do

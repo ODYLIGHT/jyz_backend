@@ -78,7 +78,10 @@ defmodule JyzBackendWeb.CarryForAccountController do
 
         cfp = CarryForAccountService.getById(id)
         cfp_changeset = CarryForAccount.changeset(cfp, cfp_params 
-                                                         |> Map.update("audited", cfp.audited, fn(c) -> cfp.audited end))
+                                                         |> Map.update("audited", cfp.audited, fn(c) -> cfp.audited end)
+                                                         |> Map.update("audit_time", cfp.audit_time, fn(c) -> cfp.audit_time end)
+                                                         |> Map.update("audit_user", cfp.audit_user, fn(c) -> cfp.audit_user end)
+                                                         |> Map.update("create_user", cfp.create_user, fn(c) -> cfp.create_user end))
         details = Map.get(cfp_params, "details") 
         case details do
           nil ->
