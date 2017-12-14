@@ -2,7 +2,8 @@ defmodule JyzBackend.OilTransferService do
     use Ecto.Schema
     import Ecto.Query, only: [from: 2]
     import Ecto.Query.API, only: [like: 2]
-    alias JyzBackend.{OilTransfer, OilTransferDetail, Repo}
+    alias JyzBackend.{OilTransfer, OilTransferDetail,StockChange,StockChangeService,OilDepotService, Repo}
+    alias Ecto.Multi
   
     def page(billno \\ "", sort_field \\ "date", sort_direction \\ "desc", page \\ 1, page_size \\ 20) do 
   
@@ -49,4 +50,50 @@ defmodule JyzBackend.OilTransferService do
     end
   
   
+     # 设置审核入库的整个过程在一个事务中,接受两个参数，移库校验单和移库校验单审核changeset
+     def auditStockIn(transfer, changeset) do 
+      Repo.transaction(create_stock_change_from_transfer(transfer, changeset))
+    end
+
+    # 审核将通过所有明细，生成库存变化记录StockChange
+    defp create_stock_change_from_transfer(transfer_with_details, changeset) do
+      # 生成multi
+      multi = Multi.new
+
+      # 获得明细用以生成StockChange
+      details = transfer_with_details.oil_transfer_details
+      # 获取单号用以填充StockChange的cno字段
+      cno = transfer_with_details.billno
+      #获取车（罐）号用以联系仓库表找到oilname填充StockChange的model
+      sp = transfer_with_details.stockplace
+      od = OilDepotService.getByName(sp) 
+      on = od.oilname
+      # ba = details |> Enum.map(fn(a) -> 0 - a.quantity end)
+      # 由明细生成StockChange map的list
+      case details do
+        nil ->%{}
+
+        details ->
+          change_sets = details          
+            |> Enum.map(fn(d) ->                                 
+           %{cno: d.billno1, date: "", model: on, amount: d.quantity, warehouse: d.stockpalce, type: "油品移入库校验单", stockin: true, calculated: false} end)
+           # 将所有stockchange插入数据库
+           |> Enum.map(fn(m) -> sc =  StockChange.changeset(%StockChange{}, m) end)
+           |> Enum.with_index
+
+           multi1 = change_sets |> Enum.reduce(multi, fn({ x, i }, acc) -> acc |> Multi.insert(Integer.to_string(i), x) end)
+
+          #由主表生成StockChange map的list
+          change_main = details
+            |> Enum.map(fn(b) ->             
+            %{cno: cno, date: "", model: on, amount: 0-b.quantity, warehouse: sp, type: "油品移出库校验单", stockin: true, calculated: false} end)
+           
+            |> Enum.map(fn(m) -> sc =  StockChange.changeset(%StockChange{}, m) end)
+            |> Enum.with_index
+            |> Enum.reduce(multi1, fn({ x, i }, acc) -> acc |> Multi.insert("#{Integer.to_string(i)} out", x) end)
+          change_main |> Multi.update("audit", changeset)
+      end
+
+    end 
+
   end

@@ -132,17 +132,17 @@ defmodule JyzBackendWeb.OilTransferController do
         case c.audited do
           false ->
             ot_changeset = OilTransfer.changeset(c, %{"audited" => true, "audit_time" => "#{DateTimeHandler.getDateTime()}", "audit_user" => Guardian.resource_name_from_conn(conn)})
-            case OilTransferService.update(ot_changeset) do
+            case OilTransferService.auditStockIn(c, ot_changeset) do
               {:ok, c} ->
-                json conn, c |> Map.drop([:oil_transfer_details])
-              {:error, changeset} ->
-                json conn, %{error: JyzBackendWeb.ChangesetError.translate_changeset_errors(changeset.errors)}
+                json conn, c["audit"] |> Map.drop([:oil_transfer_details])
+              {:error, _,_,_} ->
+                json conn, %{error: "Audit failed, please check details."}
             end
           true ->
-            json conn , %{error: "油品移库表早已经被审核过"}
+            json conn , %{error: "OilTransfer has already been audited."}
         end
     end
 
   end
-  
-  end
+
+end
