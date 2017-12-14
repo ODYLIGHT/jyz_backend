@@ -11,7 +11,7 @@ defmodule JyzBackend.GodownentryForAcceptanceDetail do
       field :totalprice, :float   #入库金额
       field :stockplace, :string  #入库地
       field :comment, :string     #备注
-      # 这里，ECTO将使用cfp_id作为外键列名
+      # 这里，ECTO将使用godownentry_for_acceptance作为外键列名
       belongs_to :godownentry_for_acceptance, GodownentryForAcceptance, on_replace: :delete
       timestamps()
     end

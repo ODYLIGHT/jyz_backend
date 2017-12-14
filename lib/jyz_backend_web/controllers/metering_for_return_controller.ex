@@ -114,11 +114,13 @@ defmodule JyzBackendWeb.MeteringForReturnController do
         case c.audited do
           false ->
             cfp_changeset = MeteringForReturn.changeset(c, %{"audited" => true, "audit_time" => "#{DateTimeHandler.getDateTime()}", "audit_user" => Guardian.resource_name_from_conn(conn)})
-            case MeteringForReturnService.update(cfp_changeset) do
+            case MeteringForReturnService.auditStockIn(c, cfp_changeset)  do
               {:ok, c} ->
-                json conn, c |> Map.drop([:metering_for_return_details])
-              {:error, changeset} ->
-                json conn, %{error: JyzBackendWeb.ChangesetError.translate_changeset_errors(changeset.errors)}
+                IO.puts("####### c is: #######")
+                IO.puts inspect c
+                json conn, c["audit"] |>  Map.drop([:metering_for_return_details])
+              {:error, _,e,_} ->
+                json conn, %{error: JyzBackendWeb.ChangesetError.translate_changeset_errors(e.errors)}
             end
           true ->
             json conn , %{error: "MeteringForReturn has already been audited."}
