@@ -55,8 +55,10 @@ defmodule JyzBackend.GodownentryForAcceptanceService do
       cno = godown_with_details.bno
 
       # 获取StockChange类型，这里是油品入库校验
-      m = GenServer.call(Globalvs, :get_dict)
-      itype = m.stockchange_type_godownentry
+      m = GenServer.call(AppDict, :get_dict)
+      IO.puts("###can get m####")
+      IO.puts inspect m
+      itype = Map.get(m, "stockchange_type_godownentry")
       
       # 由明细生成StockChange map的list
       case details do
