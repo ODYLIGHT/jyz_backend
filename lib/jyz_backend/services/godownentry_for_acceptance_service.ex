@@ -4,11 +4,7 @@ defmodule JyzBackend.GodownentryForAcceptanceService do
     alias JyzBackend.{GodownentryForAcceptance, GodownentryForAcceptanceDetail, OilDepotService, StockChange, StockChangeService, Repo}
     alias Ecto.Multi
   
-<<<<<<< HEAD
-    def page( bno \\ "",audited \\ "null", sort_field \\ "cno", sort_direction \\ "desc", page \\ 1, page_size \\ 20) do 
-=======
     def page( bno \\ "", audited \\ "null", sort_field \\ "cno", sort_direction \\ "desc", page \\ 1, page_size \\ 20) do 
->>>>>>> 693017e67f71e04c4164d166efb2f727bc60b579
   
       sort_by = [{sort_direction |> String.to_existing_atom, sort_field |> String.to_existing_atom}]
       like_term = "%#{bno}%"
@@ -16,11 +12,7 @@ defmodule JyzBackend.GodownentryForAcceptanceService do
                   where: like(u.bno , ^like_term),       
                   order_by: ^sort_by,
                   preload: [:godownentry_for_acceptance_details]
-<<<<<<< HEAD
-                   # 动态增加查询条件
-=======
        # 动态增加查询条件
->>>>>>> 693017e67f71e04c4164d166efb2f727bc60b579
       case audited do
         "true" -> query = from u in query,
                       where:  u.audited == true
@@ -71,7 +63,7 @@ defmodule JyzBackend.GodownentryForAcceptanceService do
       cno = godown_with_details.bno
 
       # 获取StockChange类型，这里是油品入库校验
-      m = GenServer.call(Globalvs, :get_dict)
+      m = GenServer.call(AppDict, :get_dict)
       itype = m.stockchange_type_godownentry
       
       # 由明细生成StockChange map的list
