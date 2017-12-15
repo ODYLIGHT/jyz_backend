@@ -62,13 +62,19 @@ defmodule JyzBackend.OilTransferService do
 
       # 获得明细用以生成StockChange
       details = transfer_with_details.oil_transfer_details
+      
       # 获取单号用以填充StockChange的cno字段
       cno = transfer_with_details.billno
+
       #获取车（罐）号用以联系仓库表找到oilname填充StockChange的model
       sp = transfer_with_details.stockplace
       od = OilDepotService.getByName(sp) 
       on = od.oilname
-      # ba = details |> Enum.map(fn(a) -> 0 - a.quantity end)
+      
+      # 获取StockChange类型，这里是油品移库校验
+      # m = GenServer.call(Globalvs, :get_dict)
+      # itype = m.stockchange_type_transfer
+
       # 由明细生成StockChange map的list
       case details do
         nil ->%{}
@@ -76,7 +82,7 @@ defmodule JyzBackend.OilTransferService do
         details ->
           change_sets = details          
             |> Enum.map(fn(d) ->                                 
-           %{cno: d.billno1, date: "", model: on, amount: d.quantity, warehouse: d.stockpalce, type: "油品移入库校验单", stockin: true, calculated: false} end)
+           %{cno: d.billno1, date: "", model: on, amount: d.quantity, warehouse: d.stockpalce, type: "油品移入调拨单", stockin: true, calculated: false} end)
            # 将所有stockchange插入数据库
            |> Enum.map(fn(m) -> sc =  StockChange.changeset(%StockChange{}, m) end)
            |> Enum.with_index
@@ -86,7 +92,7 @@ defmodule JyzBackend.OilTransferService do
           #由主表生成StockChange map的list
           change_main = details
             |> Enum.map(fn(b) ->             
-            %{cno: cno, date: "", model: on, amount: 0-b.quantity, warehouse: sp, type: "油品移出库校验单", stockin: true, calculated: false} end)
+            %{cno: cno, date: "", model: on, amount: 0-b.quantity, warehouse: sp, type: "油品移出调拨单", stockin: true, calculated: false} end)
            
             |> Enum.map(fn(m) -> sc =  StockChange.changeset(%StockChange{}, m) end)
             |> Enum.with_index
