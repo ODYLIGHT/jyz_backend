@@ -8,13 +8,13 @@ defmodule JyzBackendWeb.CarryForAccountController do
   def index(conn, params) do
 
     DateTimeHandler.getDateTime()
-    
     companyname = Map.get(params, "companyname", "")
+    audited = Map.get(params, "audited", "")
     sort_field = Map.get(params, "sort_field", "date")
     sort_direction = Map.get(params, "sort_direction", "desc")
     page = Map.get(params, "page", 1)
     page_size = Map.get(params, "page_size", 20)
-    json conn, CarryForAccountService.page(companyname,sort_field,sort_direction,page,page_size) 
+    json conn, CarryForAccountService.page(companyname,audited,sort_field,sort_direction,page,page_size) 
   end
   
   def show(conn, %{"id" => id}) do

@@ -9,11 +9,11 @@ defmodule JyzBackend.DictService do
       d
     end
     
-    def page(code \\ "", sort_field \\ "seq", sort_direction \\ "asc", page \\ 1, page_size \\ 20) do 
+    def page(name \\ "", sort_field \\ "seq", sort_direction \\ "asc", page \\ 1, page_size \\ 20) do 
       sort_by = [{sort_direction |> String.to_existing_atom, sort_field |> String.to_existing_atom}]
-      like_term = "%#{code}%"
+      like_term = "%#{name}%"
       query = from u in Dict,
-                    where: like(u.code , ^like_term),
+                    where: like(u.name , ^like_term),
                     order_by: ^sort_by
       page = query |> Repo.paginate(page: page, page_size: page_size)  
       cond do
