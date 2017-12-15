@@ -8,6 +8,7 @@ defmodule JyzBackendWeb.GodownentryForAcceptanceController do
   def index(conn, params) do
     bno = Map.get(params, "bno", "")
     audited = Map.get(params, "audited", "")
+    # supplier=Map.get(params,"")
     sort_field = Map.get(params, "sort_field", "cno")
     sort_direction = Map.get(params, "sort_direction", "desc")
     page = Map.get(params, "page", 1)

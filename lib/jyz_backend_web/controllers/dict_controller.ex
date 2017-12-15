@@ -2,12 +2,12 @@ defmodule JyzBackendWeb.DictController do
     use JyzBackendWeb, :controller
     alias JyzBackend.{Dict, DictService, Permissions}
     def index(conn, params) do
-      code = Map.get(params, "code", "")
+      name = Map.get(params, "name", "")
       sort_field = Map.get(params, "sort_field", "seq")
       sort_direction = Map.get(params, "sort_direction", "asc")
       page = Map.get(params, "page", 1)
       page_size = Map.get(params, "page_size", 20)
-       json conn, DictService.page(code,sort_field,sort_direction,page,page_size) 
+       json conn, DictService.page(name,sort_field,sort_direction,page,page_size) 
     end
   
    def new(conn, %{"dict" => dict_params}) do

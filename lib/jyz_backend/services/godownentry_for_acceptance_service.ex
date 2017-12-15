@@ -4,7 +4,7 @@ defmodule JyzBackend.GodownentryForAcceptanceService do
     alias JyzBackend.{GodownentryForAcceptance, GodownentryForAcceptanceDetail, OilDepotService, StockChange, StockChangeService, Repo}
     alias Ecto.Multi
   
-    def page( bno \\ "", sort_field \\ "cno", sort_direction \\ "desc", page \\ 1, page_size \\ 20) do 
+    def page( bno \\ "", audited \\ "null", sort_field \\ "cno", sort_direction \\ "desc", page \\ 1, page_size \\ 20) do 
   
       sort_by = [{sort_direction |> String.to_existing_atom, sort_field |> String.to_existing_atom}]
       like_term = "%#{bno}%"
@@ -12,6 +12,14 @@ defmodule JyzBackend.GodownentryForAcceptanceService do
                   where: like(u.bno , ^like_term),       
                   order_by: ^sort_by,
                   preload: [:godownentry_for_acceptance_details]
+       # 动态增加查询条件
+      case audited do
+        "true" -> query = from u in query,
+                      where:  u.audited == true
+        "false" -> query = from u in query,
+                      where:  u.audited == false
+        _ -> query = query
+      end
       page = query |> Repo.paginate(page: page, page_size: page_size)      
       cond do
         page.entries > 0 ->
