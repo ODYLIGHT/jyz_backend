@@ -115,7 +115,11 @@ end
             case GodownentryForAcceptanceService.auditStockIn(c, cfp_changeset) do
               {:ok, c} ->
                 json conn, c["audit"] |> Map.drop([:godownentry_for_acceptance_details])
-              {:error, _,_,_} ->
+              {:error, a,b,c} ->
+                IO.puts("##### print error #####")
+                IO.puts inspect a
+                IO.puts inspect b
+                IO.puts inspect c
                 json conn, %{error: "Audit failed, please check details."}
             end
           true ->
