@@ -1,9 +1,14 @@
 defmodule JyzBackendWeb.StockChangeController do
     use JyzBackendWeb, :controller
-    alias JyzBackend.{StockChange, StockChangeService, Permissions, Guardian, Periodically, DictService}
+    alias JyzBackend.{StockChange, StockChangeService, Permissions, Guardian, Periodically, OilDepotService}
   
     def index(conn, params) do
       # d = GenServer.call(AppDict, :get_dict)
+      r = OilDepotService.calculateStock()
+      # scs = StockChangeService.find_stock_change_from_oildepot("11")
+      IO.puts("##############")
+      IO.puts inspect r
+
       cno = Map.get(params, "cno", "")
       warehouse = Map.get(params, "warehouse", "")
       type = Map.get(params, "type", "")

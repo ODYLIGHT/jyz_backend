@@ -7,13 +7,15 @@ defmodule JyzBackendWeb.GodownentryForAcceptanceController do
   
   def index(conn, params) do
     bno = Map.get(params, "bno", "")
-    # cno=Map.get(params,"cno","")
+    audited = Map.get(params, "audited", "")
+    # supplier=Map.get(params,"")
     sort_field = Map.get(params, "sort_field", "cno")
     sort_direction = Map.get(params, "sort_direction", "desc")
     page = Map.get(params, "page", 1)
     page_size = Map.get(params, "page_size", 20)
-    json conn, GodownentryForAcceptanceService.page(bno,sort_field,sort_direction,page,page_size) 
+    json conn, GodownentryForAcceptanceService.page(bno,audited,sort_field,sort_direction,page,page_size) 
   end
+  
   
   def show(conn, %{"id" => id}) do
     case GodownentryForAcceptanceService.getById(id) do
@@ -65,16 +67,28 @@ defmodule JyzBackendWeb.GodownentryForAcceptanceController do
   end
   
   def update(conn, %{"id" => id, "godownentryforacceptance" => cfp_params}) do
-    # try do
+checkperm = Permissions.hasAllPermissions(conn, [:modify_something])
+    case { checkperm, GodownentryForAcceptanceService.getById(id) } do
+      { false, _ } ->
+        json conn, %{error: "Unauthorized operation."}
+      { true, nil } ->
+        json conn , %{error: "Can not find GodownentryForAcceptance"}
+      { true, cfp } ->
+
 
     cfp = GodownentryForAcceptanceService.getById(id)
-    cfp_changeset = GodownentryForAcceptance.changeset(cfp, cfp_params)
+        cfp_changeset = GodownentryForAcceptance.changeset(cfp, cfp_params 
+                                                         |> Map.update("audited", cfp.audited, fn(c) -> cfp.audited end)
+                                                         |> Map.update("audit_time", cfp.audit_time, fn(c) -> cfp.audit_time end)
+                                                         |> Map.update("audit_user", cfp.audit_user, fn(c) -> cfp.audit_user end)
+                                                         |> Map.update("create_user", cfp.create_user, fn(c) -> cfp.create_user end))
     details = Map.get(cfp_params, "details")
    case details do
         nil ->
           details = []
         details ->
           details =details |> Enum.map(fn(m) -> GodownentryForAcceptanceDetail.changeset(%GodownentryForAcceptanceDetail{}, m) end)
+          end
     cfp_with_details = Ecto.Changeset.put_assoc(cfp_changeset, :godownentry_for_acceptance_details, details)
     case GodownentryForAcceptanceService.update(cfp_with_details) do
       {:ok, cfp} ->
@@ -101,7 +115,11 @@ end
             case GodownentryForAcceptanceService.auditStockIn(c, cfp_changeset) do
               {:ok, c} ->
                 json conn, c["audit"] |> Map.drop([:godownentry_for_acceptance_details])
-              {:error, _,_,_} ->
+              {:error, a,b,c} ->
+                IO.puts("##### print error #####")
+                IO.puts inspect a
+                IO.puts inspect b
+                IO.puts inspect c
                 json conn, %{error: "Audit failed, please check details."}
             end
           true ->
@@ -109,4 +127,5 @@ end
         end
     end
   end
-end
+
+end        

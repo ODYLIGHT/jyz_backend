@@ -5,6 +5,8 @@ defmodule JyzBackend.DictServer do
   def start_link do
     # 数据字典表中应该包含下面的键值对
     # app_dictionary = %{
+    # stockchange_type_transfer : "油库调拨",
+    # stockchange_type_dispatch : "油品配送出库",
     #   stockchange_type_godownentry: "油品入库校验",
     #   stockchange_type_metering_for_return: "油品计量回灌",
     #   fuel_type_95: "95#汽油",
