@@ -22,7 +22,6 @@ defmodule JyzBackend.CarryForAccount do
       |> cast(attrs, [:companyname, :date, :responsibleperson, :operator,  :audited, :audit_time, :audit_user, :create_user])
       |> validate_required([:companyname, :date, :responsibleperson, :operator])
       |> unique_constraint(:companyname)
-      |> validate_length(:companyname, min: 4)
   end
 
   # 自定义验证器
