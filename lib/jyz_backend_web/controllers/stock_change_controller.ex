@@ -18,4 +18,14 @@ defmodule JyzBackendWeb.StockChangeController do
       page_size = Map.get(params, "page_size", 20)
       json conn, StockChangeService.page(cno,warehouse,type,sort_field,sort_direction,page,page_size)
     end  
+
+  #   def show(conn, %{"id" => id}) do
+  #   case StockChangeService.getById(id) do
+  #     nil ->
+  #       json conn, %{error: "can not find StockChange"}
+  #     cfp ->
+  #       IO.puts inspect cfp
+  #       json conn, cfp |>ResolveAssociationRecursion.resolve_recursion_in_map(:stockchange)
+  #   end
+  # end
 end
