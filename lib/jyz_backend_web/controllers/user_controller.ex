@@ -151,7 +151,8 @@ defmodule JyzBackendWeb.UserController do
     end
 
     # 激活用户,实现与修改用户相同
-    def activateUser(conn, %{"id" => id}) do 
+    def activateUser(conn, %{"id" => id}) do
+      IO.puts("激活用户#####")
       # 判断是否具备权限
       checkperm = Permissions.hasAllPermissions(conn, [:all_users])
       case { checkperm, UserService.getById(id) } do
