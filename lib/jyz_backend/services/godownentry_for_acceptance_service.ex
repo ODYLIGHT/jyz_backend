@@ -53,7 +53,7 @@ defmodule JyzBackend.GodownentryForAcceptanceService do
       Repo.transaction(create_stock_change_from_godown(godown, changeset))
     end
 
-    # 审核将通过所有明细，生成库存变化记录StockChange
+    #  从所有明细，生成库存变化记录StockChange
     defp create_stock_change_from_godown(godown_with_details, changeset) do
       # 生成multi
       multi = Multi.new
@@ -64,7 +64,9 @@ defmodule JyzBackend.GodownentryForAcceptanceService do
 
       # 获取StockChange类型，这里是油品入库校验
       m = GenServer.call(AppDict, :get_dict)
-      itype = m.stockchange_type_godownentry
+      IO.puts("###can get m####")
+      IO.puts inspect m
+      itype = Map.get(m, "stockchange_type_godownentry")
       
       # 由明细生成StockChange map的list
       case details do

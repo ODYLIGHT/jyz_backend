@@ -2,7 +2,8 @@ defmodule JyzBackend.StockChangeService do
     use Ecto.Schema
     import Ecto.Query, only: [from: 2]
     import Ecto.Query.API, only: [like: 2]
-    alias JyzBackend.{Repo, StockChange}
+    alias JyzBackend.{Repo, StockChange, DateTimeHandler}
+    alias Ecto.Multi
   
     def create(changeset) do
       Repo.insert(changeset)
@@ -15,39 +16,35 @@ defmodule JyzBackend.StockChangeService do
                     where: like(u.cno , ^like_term),
                     order_by: ^sort_by
       query |> Repo.paginate(page: page, page_size: page_size)  
-    #   cond do
-    #     page.entries > 0 ->
-    #       %{page | entries: page.entries |> Enum.map(fn(u) -> Map.drop(u, [:password_hash, :password]) end)}
-    #     true ->
-    #       page
-    #   end
+
     end
   
-    # def delete(sc) do
-    #   Repo.delete!(sc) 
-    # end
+
   
     def update(changeset) do
       Repo.update(changeset)
     end
-  
-    # def getById(id) do
-    #   Repo.get(User, id)
-    # end
-  
-    # def getByName(name) do
-    #   Repo.get_by(User, username: name)
-    # end
 
-    # def getUsernameById(id) do
-    #   case Repo.get(User, id) do
-    #     nil -> ""
-    #     u -> u.username
-    #   end
-    # end
+    # 查询某一仓库的库存变化，供计算库存使用
+    def find_stock_change_from_oildepot(oildepotname) do
+      query = from sc in StockChange,
+                where: sc.warehouse == ^oildepotname,
+                where: sc.calculated == false
+      Repo.all(query)
+    end
 
-    # def getUsernameById() do
-    #   ""
-    # end
+    # 在计算过库存后，将未能计算的库存全部更新为计算失败状态
+    def markInvalid() do
+      multi = Multi.new
+      query = from sc in StockChange,
+        where: sc.calculated == false
+      Repo.all(query)
+        |> Enum.map(fn(sc) -> StockChange.changeset(sc, %{ date: DateTimeHandler.getDateTime(), calculated: true, cal_status: false}) end)
+        |> Enum.with_index
+        |> Enum.reduce(multi, fn({ x, i }, acc) -> acc |> Multi.update("#{Integer.to_string(i)} flush_invalid", x) end)
+        |> Repo.transaction
+    end
+
+
   
   end
