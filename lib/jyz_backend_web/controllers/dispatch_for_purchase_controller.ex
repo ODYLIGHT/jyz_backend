@@ -9,12 +9,12 @@ defmodule JyzBackendWeb.DispatchForPurchaseController do
     DateTimeHandler.getDateTime()
     billno = Map.get(params, "billno", "")
     # date = Map.get(params, "date", "")
-    # audited = Map.get(params, "audited", "")
+    audited = Map.get(params, "audited", "")
     sort_field = Map.get(params, "sort_field", "date")
     sort_direction = Map.get(params, "sort_direction", "desc")
     page = Map.get(params, "page", 1)
     page_size = Map.get(params, "page_size", 20)
-    json conn, DispatchForPurchaseService.page(billno,sort_field,sort_direction,page,page_size) 
+    json conn, DispatchForPurchaseService.page(billno,audited,sort_field,sort_direction,page,page_size) 
   end
   
   def show(conn, %{"id" => id}) do
@@ -105,7 +105,9 @@ defmodule JyzBackendWeb.DispatchForPurchaseController do
     
 # 油品配送出库单审核
   def audit(conn,  %{"id" => id}) do
-    
+    m = GenServer.call(AppDict, :get_dict)
+    IO.puts("#######")
+    IO.puts inspect m
     checkperm = Permissions.hasAllPermissions(conn, [:audit_something])
     case { checkperm, DispatchForPurchaseService.getById(id) } do
       { false, _ } ->
@@ -116,21 +118,18 @@ defmodule JyzBackendWeb.DispatchForPurchaseController do
         case c.audited do
           false ->
             cfp_changeset = DispatchForPurchase.changeset(c, %{"audited" => true, "audit_time" => "#{DateTimeHandler.getDateTime()}", "audit_user" => Guardian.resource_name_from_conn(conn)})
-            case DispatchForPurchaseService.update(cfp_changeset) do
+            case DispatchForPurchaseService.auditStockIn(c, cfp_changeset) do
               {:ok, c} ->
-                json conn, c |> Map.drop([:dispatch_for_purchase_details])
-              {:error, changeset} ->
-                json conn, %{error: JyzBackendWeb.ChangesetError.translate_changeset_errors(changeset.errors)}
+                json conn, c["audit"] |> Map.drop([:dispatch_for_purchase_details])
+              {:error, a,b,c} ->
+                IO.puts inspect a
+                IO.puts inspect b
+                IO.puts inspect c
+                json conn, %{error: "Audit failed, please check details."}
             end
           true ->
             json conn , %{error: "DispatchForPurchase has already been audited."}
         end
     end
-
   end
-
 end
-  
-
-  
-
