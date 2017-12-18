@@ -95,6 +95,12 @@ defmodule JyzBackendWeb.Router do
     delete "/carry_for_account/:id", CarryForAccountController, :delete
     post "/carry_for_account/:id", CarryForAccountController, :update
     get "/carry_for_account/audit/:id", CarryForAccountController, :audit
+
+
+     # 查看库存变化量
+    get "/stock_change", StockChangeController, :index
+    get "/stock_change/:id", StockChangeController, :show
+
  
 
   #数据字典
@@ -103,6 +109,7 @@ defmodule JyzBackendWeb.Router do
     post "/dict", DictController, :new
     delete "/dict/:id", DictController, :delete
     post "/dict/:id", DictController, :update
+
  end
 
   # scope "/api/v1", JyzBackendWeb do

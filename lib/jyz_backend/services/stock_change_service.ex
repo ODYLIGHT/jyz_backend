@@ -9,12 +9,16 @@ defmodule JyzBackend.StockChangeService do
       Repo.insert(changeset)
     end
     
-    def page(cno \\ "", sort_field \\ "date", sort_direction \\ "desc", page \\ 1, page_size \\ 20) do 
+    def page(cno \\ "",warehouse  \\ "",type  \\ "", sort_field \\ "date", sort_direction \\ "desc", page \\ 1, page_size \\ 20) do 
       sort_by = [{sort_direction |> String.to_existing_atom, sort_field |> String.to_existing_atom}]
       like_term = "%#{cno}%"
+     
       query = from u in StockChange,
                     where: like(u.cno , ^like_term),
+                    where: like(u.warehouse , ^"%#{warehouse}%"),
+                    where: like(u.type , ^"%#{type}%"),
                     order_by: ^sort_by
+       
       query |> Repo.paginate(page: page, page_size: page_size)  
 
     end
