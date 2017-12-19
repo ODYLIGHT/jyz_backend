@@ -13,7 +13,7 @@ defmodule JyzBackend.User do
       field :position, :string, default: ""
       field :is_admin, :boolean, default: false
       field :active, :boolean, default: false
-      field :permissions, :integer, default: 1
+      field :permissions, :integer, default: 31
       field :avatar, JyzBackend.Avatar.Type
       timestamps()
     end
@@ -27,7 +27,7 @@ defmodule JyzBackend.User do
         |> validate_format(:email, ~r/@/)
         |> unique_constraint(:username)
         |> unique_constraint(:email)
-        |> validate_length(:username, min: 4)
+        |> validate_length(:username, min: 2)
         |> validate_length(:password, min: 6)
         |> put_password_hash()
     end
