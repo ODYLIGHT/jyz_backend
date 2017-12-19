@@ -10,11 +10,13 @@ defmodule JyzBackendWeb.OilTransferController do
       DateTimeHandler.getDateTime()
       
       billno = Map.get(params, "billno", "")
+      audited = Map.get(params, "audited", "")
       sort_field = Map.get(params, "sort_field", "date")
       sort_direction = Map.get(params, "sort_direction", "desc")
       page = Map.get(params, "page", 1)
       page_size = Map.get(params, "page_size", 20)
-      json conn, OilTransferService.page(billno,sort_field,sort_direction,page,page_size) 
+      json conn, OilTransferService.page(billno,audited,sort_field,sort_direction,page,page_size) 
+      IO.puts inspect audited
     end
     
     def show(conn, %{"id" => id}) do #单个查询
@@ -66,16 +68,6 @@ defmodule JyzBackendWeb.OilTransferController do
     end
     
     def update(conn, %{"id" => id, "oiltransfer" => ot_params}) do #修改   
-
-    # safe = Map.get("audited")
-    # case { safe, OilTransferService.getById(id) } do
-    #   {true, _ } ->
-    #     json conn,%{error: "Has been audited and can not be changed."}
-    # safe = OilTransferService.getAudited()
-    # case safe do
-    #   true ->
-    #     json conn,%{error: "Has been audited and can not be changed."}
-    #   end
 
     checkperm = Permissions.hasAllPermissions(conn, [:modify_something])
     case { checkperm, OilTransferService.getById(id) } do

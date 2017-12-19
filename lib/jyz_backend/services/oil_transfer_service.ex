@@ -5,15 +5,24 @@ defmodule JyzBackend.OilTransferService do
     alias JyzBackend.{OilTransfer, OilTransferDetail,StockChange,StockChangeService,OilDepotService, Repo}
     alias Ecto.Multi
   
-    def page(billno \\ "", sort_field \\ "date", sort_direction \\ "desc", page \\ 1, page_size \\ 20) do 
+    def page(billno \\ "", audited \\ "null", sort_field \\ "date", sort_direction \\ "desc", page \\ 1, page_size \\ 20) do 
   
       sort_by = [{sort_direction |> String.to_existing_atom, sort_field |> String.to_existing_atom}]
       like_term = "%#{billno}%"
-    
+
       query = from u in OilTransfer,
                   where: like(u.billno , ^like_term),
                   order_by: ^sort_by,
                   preload: [:oil_transfer_details]
+
+      # 动态增加查询条件
+      case audited do
+        "true" -> query = from u in query,
+            where:  u.audited == true
+        "false" -> query = from u in query,
+            where:  u.audited == false
+          _ -> query = query
+      end
     
       page = query |> Repo.paginate(page: page, page_size: page_size)
         
@@ -32,10 +41,6 @@ defmodule JyzBackend.OilTransferService do
         preload: [:oil_transfer_details] 
     end
 
-    # def  (audited) do
-    #   Repo.one from d in OilTransfer,
-    #    where: d.audited == ^audited
-    # end
   
     def create(changeset) do
       Repo.insert(changeset)
