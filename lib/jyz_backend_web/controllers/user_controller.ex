@@ -1,6 +1,6 @@
 defmodule JyzBackendWeb.UserController do
     use JyzBackendWeb, :controller
-    alias JyzBackend.{User, UserService, Permissions, Guardian}
+    alias JyzBackend.{User, UserService, LoginService, Permissions, Guardian}
   
     def index(conn, params) do
       username = Map.get(params, "username", "")
@@ -76,15 +76,11 @@ defmodule JyzBackendWeb.UserController do
     end
 
     # 用户修改密码,需要验证旧密码
-    def changePassword(conn, %{"old_password" => oldpwd, "new_password" => pwd}) do
+    def changePassword(conn, %{"pwd" => pwd}) do
       user = Guardian.resource_from_conn(conn)
-      checkpwd = Comeonin.Pbkdf2.checkpw(oldpwd, user.password_hash)
       checkperm = Permissions.hasAllPermissions(conn, [:user_about_me])
 
-      case checkpwd do
-        false ->
-          json conn, %{error: "The old password is wrong."}
-        true ->
+
           case { checkperm, user } do
             { false, _ } ->
               json conn, %{error: "Unauthorized operation."}
@@ -100,7 +96,7 @@ defmodule JyzBackendWeb.UserController do
               end
           end
 
-      end
+     
 
       
     end
@@ -120,12 +116,34 @@ defmodule JyzBackendWeb.UserController do
       end
     end
   
+    # 验证用户注册时的用户名重复
     def checkUsername(conn, %{"username" => name}) do
       case UserService.getByName(name) do
         nil ->
           json conn, %{error: "can not find user"}
         user ->
           json conn, user |> Map.drop([:password, :password_hash])
+      end
+    end
+
+    # 验证用户修改时的邮箱重复
+    def checkEmail(conn, %{"email" => email}) do
+      IO.puts("###### before get email######")
+      case { Guardian.resource_from_conn(conn).email == email, UserService.getByEmail(email) } do
+        { _, nil } ->
+          json conn, %{success: "can not find user"}
+        { true, _ } ->
+          json conn, %{success: "use the old email"}
+        _ ->
+          json conn, %{error: "email has been taken"}
+      end
+    end
+
+    # 验证用户修改密码时的旧密码
+    def checkPassword(conn, %{"pwd" => pwd}) do
+      case LoginService.checkPassword(Guardian.resource_name_from_conn(conn), pwd) do
+        {:ok, user} -> json conn, %{success: "Valid username or password"}
+        {:error, _} -> json conn, %{error: "Invalid username or password"}
       end
     end
   

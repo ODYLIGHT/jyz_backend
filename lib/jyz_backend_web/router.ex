@@ -16,15 +16,10 @@ defmodule JyzBackendWeb.Router do
   scope "/api/v1", JyzBackendWeb do
     pipe_through :api
  
-   
     get "/users/username/:username", UserController, :checkUsername
+    
     post "/login", LoginController, :login
 
-    
-
-    
-
-    
   end
 
   scope "/api/v1", JyzBackendWeb do
@@ -37,8 +32,12 @@ defmodule JyzBackendWeb.Router do
     get "/users", UserController, :index
     get "/users/:id", UserController, :show
     post "/users", UserController, :new
+
+    get "/users/checkpwd/:pwd", UserController, :checkPassword
+    get "/users/email/:email", UserController, :checkEmail
+    
    
-    post "/users/changepwd", UserController, :changePassword
+    post "/users/changepwd/:pwd", UserController, :changePassword
 
     # 查看库存变化量
     get "/stock_change", StockChangeController, :index
