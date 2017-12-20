@@ -53,10 +53,21 @@ defmodule JyzBackendWeb.UserController do
       end
     end
   
-    # 用户自己修改自己，无法修改激活状态，无法修改用户名
-    def update(conn, %{"user" => user_params}) do
-      user = Guardian.resource_from_conn(conn)
-      checkperm = Permissions.hasAllPermissions(conn, [:user_about_me])
+    # 用户自己修改自己，无法修改激活状态，无法修改用户名;另外如果是连接用户与传入用户不相等，则代表是管理员正在修改用户
+    def update(conn, %{"user" => user_params, "id" => id}) do
+      conn_user = Guardian.resource_from_conn(conn)
+      modify_user = UserService.getById(id)
+      user = nil
+      checkperm = false
+      case conn_user == modify_user do
+        true -> 
+          user = conn_user
+          checkperm =  Permissions.hasAnyPermissions(conn, [:user_about_me, :all_users])
+        false ->
+          user = modify_user
+          checkperm =  Permissions.hasAllPermissions(conn, [:all_users])
+      end
+
       case { checkperm, user } do
         { false, _ } ->
           json conn, %{error: "Unauthorized operation."}
@@ -65,7 +76,8 @@ defmodule JyzBackendWeb.UserController do
         { true, user } ->
           user_changeset = User.changeset(user, user_params 
                                                   |> Map.update("active", user.active, fn(c) -> user.active end)
-                                                  |> Map.update("username", user.username, fn(c) -> user.username end))
+                                                  |> Map.update("username", user.username, fn(c) -> user.username end)
+                                                  |> Map.update("permissions", user.permissions, fn(c) -> user.permissions end))
           case UserService.update(user_changeset) do
             {:ok, user} ->
               json conn, user

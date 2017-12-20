@@ -62,8 +62,11 @@ defmodule JyzBackendWeb.OilDepotController do
     end
     
     def update(conn, %{"id" => id, "oildepot" => od_params}) do #修改
-      od = OilDepotService.getById(id)
-      od_changeset = OilDepot.changeset(od, od_params)
+      checkperm = Permissions.hasAllPermissions(conn, [:all_something])
+      case checkperm do 
+        true ->
+          od = OilDepotService.getById(id)
+          od_changeset = OilDepot.changeset(od, od_params)
     #   details = Map.get(ot_params,"details")
     #   case details do
     #     nil ->
@@ -72,11 +75,13 @@ defmodule JyzBackendWeb.OilDepotController do
     #       details = details |> Enum.map(fn(m) -> OilTransferDetail.changeset(%OilTransferDetail{}, m) end)
     #   end
     #  oildepots = Ecto.Changeset.put_assoc(od_changeset)
-      case OilDepotService.update(od_changeset) do
-        {:ok, ot} ->
-          json conn, ot
-        {:error, changeset} ->
-          json conn , %{error: JyzBackendWeb.ChangesetError.translate_changeset_errors(changeset.errors)}
+          case OilDepotService.update(od_changeset) do
+            {:ok, ot} ->
+              json conn, ot
+            {:error, changeset} ->
+              json conn , %{error: JyzBackendWeb.ChangesetError.translate_changeset_errors(changeset.errors)}
+          end
+        false -> json conn, %{error: "越权操作"}
       end
     end
   

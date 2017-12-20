@@ -49,7 +49,7 @@ defmodule JyzBackendWeb.MeteringForReturnController do
   end
   
   def delete(conn, %{"id" => id}) do 
-    checkperm = Permissions.hasAllPermissions(conn, [:all_something])
+    checkperm = Permissions.hasAllPermissions(conn, [:modify_something])
     case { checkperm, MeteringForReturnService.getById(id) } do
       { false, _ } ->
         json conn, %{error: "Unauthorized operation."}

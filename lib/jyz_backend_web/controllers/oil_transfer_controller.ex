@@ -51,7 +51,7 @@ defmodule JyzBackendWeb.OilTransferController do
     end
     
     def delete(conn, %{"id" => id}) do #删除
-      checkperm = Permissions.hasAllPermissions(conn, [:all_something])
+      checkperm = Permissions.hasAllPermissions(conn, [:modify_something])
       case { checkperm, OilTransferService.getById(id) } do
         { false, _ } ->
           json conn, %{error: "越权操作"}

@@ -43,6 +43,9 @@ defmodule JyzBackendWeb.DictController do
   end
   
     def update(conn, %{"id" => id, "dict" => dict_params}) do
+      checkperm = Permissions.hasAllPermissions(conn, [:all_something]) 
+      case checkperm do
+        true ->
           dict=DictService.getById(id)
           dict_changeset = Dict.changeset(dict, dict_params)
           case DictService.update(dict_changeset) do
@@ -51,7 +54,9 @@ defmodule JyzBackendWeb.DictController do
             {:error, changeset} ->
               json conn, %{error: JyzBackendWeb.ChangesetError.translate_changeset_errors(changeset.errors)}
           end
+        false -> json conn, %{error: "Unauthorized operation."}
       end
+    end
       
       # 获取当前登录用户
   defp get_current_user(conn) do

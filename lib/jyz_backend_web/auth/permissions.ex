@@ -27,9 +27,15 @@ defmodule JyzBackend.Permissions do
     JyzBackend.Permissions.decode_permissions_from_claims(claims)
   end
   
-  # 判断是否具备权限
+  # 判断是否具备所有权限
   def hasAllPermissions(conn, list) do
     getPermissions(conn) |> JyzBackend.Permissions.all_permissions?(%{default: list})
+  end
+
+  # 判断是否具备之一权限
+  def hasAnyPermissions(conn, list) do
+    getPermissions(conn) |> JyzBackend.Permissions.any_permissions?(%{default: list})
+    # .all_permissions?(%{default: list})
   end
 
 end
