@@ -13,7 +13,7 @@ defmodule JyzBackend.User do
       field :position, :string, default: ""
       field :is_admin, :boolean, default: false
       field :active, :boolean, default: false
-      field :permissions, :integer, default: 1
+      field :permissions, :integer, default: 31
       field :avatar, JyzBackend.Avatar.Type
       timestamps()
     end

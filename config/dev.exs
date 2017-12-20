@@ -54,5 +54,5 @@ config :jyz_backend, JyzBackend.Repo,
   username: "postgres",
   password: "postgres",
   database: "jyzdb",
-  hostname: "172.27.21.162",
+  hostname: "172.27.22.79",
   pool_size: 10
