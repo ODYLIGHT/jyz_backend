@@ -10,8 +10,11 @@ defmodule JyzBackend.Repo.Migrations.CreateTableUsers do
       add :position, :string, default: ""
       add :is_admin, :boolean
       add :avatar, :string
-    
+      add :permissions, :integer
+      add :active, :Boolean
       timestamps()
     end
+    create unique_index(:users, [:username])
+    create unique_index(:users, [:email])
   end
 end

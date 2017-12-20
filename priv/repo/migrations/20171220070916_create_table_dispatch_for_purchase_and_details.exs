@@ -1,4 +1,4 @@
-defmodule JyzBackend.Repo.Migrations.CreateTableDispatchForPurchaseAndDetail do
+defmodule JyzBackend.Repo.Migrations.CreateTableDispatchForPurchaseAndDetails do
   use Ecto.Migration
 
   def change do
@@ -12,11 +12,10 @@ defmodule JyzBackend.Repo.Migrations.CreateTableDispatchForPurchaseAndDetail do
       add :dispatcher, :string
       add :stockman, :string
       add :accountingclerk, :string
-      add :entryperson, :string
-      add :auditperson, :string
-      add :state, :string
-      add :auditdate, :string
-
+      add :create_user, :string                           
+      add :audit_user, :string                            
+      add :audited, :boolean, null: false, default: false 
+      add :audit_time, :string
 
 
       timestamps()
@@ -34,7 +33,5 @@ defmodule JyzBackend.Repo.Migrations.CreateTableDispatchForPurchaseAndDetail do
     
       timestamps()
     end
-
   end
 end
-

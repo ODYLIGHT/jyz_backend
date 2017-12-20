@@ -8,15 +8,13 @@ defmodule JyzBackend.Dict do
     field :name, :string    #名称
     field :key, :string     #键
     field :parm, :string    #值
-    field :value, :float    #值
-    field :seq, :integer    #序列
     timestamps()
   end
     
   @doc false
   def changeset(%Dict{} = dict, attrs) do
     dict
-      |> cast(attrs, [:code, :name, :key, :parm, :value, :seq])
+      |> cast(attrs, [:code, :name, :key, :parm])
       |> validate_required([:code, :name, :key])
       |> unique_constraint(:code)
       |> validate_length(:code, min: 4)

@@ -3,7 +3,7 @@ defmodule JyzBackendWeb.DictController do
     alias JyzBackend.{Dict, DictService, Permissions}
     def index(conn, params) do
       name = Map.get(params, "name", "")
-      sort_field = Map.get(params, "sort_field", "seq")
+      sort_field = Map.get(params, "sort_field", "key")
       sort_direction = Map.get(params, "sort_direction", "asc")
       page = Map.get(params, "page", 1)
       page_size = Map.get(params, "page_size", 20)

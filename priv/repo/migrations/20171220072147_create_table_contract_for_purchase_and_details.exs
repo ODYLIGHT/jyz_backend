@@ -1,4 +1,4 @@
-defmodule JyzBackend.Repo.Migrations.CreateTableContractForPurchaseAndDetail do
+defmodule JyzBackend.Repo.Migrations.CreateTableContractForPurchaseAndDetails do
   use Ecto.Migration
 
   def change do
@@ -9,7 +9,10 @@ defmodule JyzBackend.Repo.Migrations.CreateTableContractForPurchaseAndDetail do
       add :amount, :float, default: 0
       add :partya, :string
       add :partyb, :string
-
+      add :audited, :boolean, null: false, default: false
+      add :create_user, :string
+      add :audit_time, :string
+      add :audit_user, :string
       timestamps()
     end
     
@@ -21,10 +24,9 @@ defmodule JyzBackend.Repo.Migrations.CreateTableContractForPurchaseAndDetail do
       add :unit, :string
       add :price, :float, default: 0
       add :totalprice, :float, default: 0
-      add :cfp_id, references(:contract_for_purchase)
+      add :contract_for_purchase_id, references(:contract_for_purchase)
     
       timestamps()
     end
-
   end
 end
