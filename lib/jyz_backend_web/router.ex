@@ -20,12 +20,14 @@ defmodule JyzBackendWeb.Router do
     
     post "/login", LoginController, :login
 
+    
+
   end
 
   scope "/api/v1", JyzBackendWeb do
     pipe_through [:api, :api_auth]
     post "/users/:id/activate", UserController, :activateUser
-    post "/users/avatar/:id", UserController, :setAvatar
+    
     delete "/users/:id", UserController, :delete
     post "/users/:id", UserController, :update
 
@@ -38,6 +40,8 @@ defmodule JyzBackendWeb.Router do
     
    
     post "/users/changepwd/:pwd", UserController, :changePassword
+
+    post "/users/avatar/upload", UserController, :setAvatar
 
     # 查看库存变化量
     get "/stock_change", StockChangeController, :index

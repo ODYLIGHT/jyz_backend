@@ -12,7 +12,12 @@ defmodule JyzBackend.Avatar do
   
     # Whitelist file extensions:
     def validate({file, _}) do
-      ~w(.jpg .jpeg .gif .png) |> Enum.member?(Path.extname(file.file_name))
+      true
+      # ~w(.jpg .jpeg .gif .png) |> Enum.member?(Path.extname(file.file_name))
+    end
+
+    def transform(:original, _) do
+      Base.decode64!(:original)
     end
   
     # Define a thumbnail transformation:

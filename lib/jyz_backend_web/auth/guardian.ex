@@ -30,4 +30,9 @@ defmodule JyzBackend.Guardian do
     conn.private.guardian_default_resource.username
   end
 
+  def get_user_from_token(token) do
+    {:ok, claims} = JyzBackend.Guardian.decode_and_verify(token)
+    JyzBackend.Guardian.resource_from_claims(claims)
+  end
+
 end

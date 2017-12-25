@@ -162,8 +162,9 @@ defmodule JyzBackendWeb.UserController do
     # 上传用户头像图片文件
     def setAvatar(conn,  %{"avatar" => avatar_params}) do
       # 判断是否具备权限
-      checkperm = Permissions.hasAllPermissions(conn, [:user_about_me])
-      case { checkperm, Guardian.Plug.current_resource(conn) } do
+      # checkperm = Permissions.hasAllPermissions(conn, [:user_about_me])
+      user = Guardian.resource_from_conn(conn)
+      case { true, user} do
         { false, _} ->
           json conn, %{error: "Unauthorized operation."}
         { true, nil } ->
@@ -173,6 +174,9 @@ defmodule JyzBackendWeb.UserController do
           changeset = User.changeset(user, user_params)
           case UserService.update(changeset) do
             {:ok, user} ->
+              # IO.puts("### before store manually ###")
+              # JyzBackend.Avatar.store(%{filename: "file.png", binary: Base.decode64!(avatar_params)})
+              # IO.puts("### after store manually ###")
               json conn, user |> Map.drop([:avatar, :password, :password_hash])
             {:error, changeset} ->
               json conn, %{error: JyzBackendWeb.ChangesetError.translate_changeset_errors(changeset.errors)}
