@@ -15,7 +15,10 @@ config :jyz_backend, JyzBackendWeb.Endpoint,
   secret_key_base: "HscAoPkeF6E7p9DFXwHkXauJmv9TAGsXS/YAmEXH+iCJe+bKchzGygQwFgW8Xdda",
   render_errors: [view: JyzBackendWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: JyzBackend.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+           adapter: Phoenix.PubSub.PG2],
+
+  # 自定义配置baseurl
+  baseurl: "http://localhost:4000"
 
 # Configures Elixir's Logger
 config :logger, :console,

@@ -13,6 +13,7 @@ defmodule JyzBackendWeb.LoginController do
         claims = Guardian.Plug.current_claims(new_conn) 
         exp = Map.get(claims, "exp") 
         user = user |> Map.drop([:chat_with_somebodies, :password, :password_hash])
+                    |> Map.update!(:avatar, fn(_v) -> JyzBackendWeb.UserController.getAvatarUrl(user) end)
         perms = Permissions.getPermissions(new_conn)[:default]
         json new_conn, %{user: user, jwt: jwt, perms: perms, exp: exp}
       {:error, _} ->

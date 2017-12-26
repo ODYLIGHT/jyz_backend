@@ -23,6 +23,8 @@ defmodule JyzBackendWeb.Router do
     # 自定义token验证
     post "/users/avatar/upload/:token", UserController, :setAvatar
 
+    post "/users", UserController, :new
+
     
 
     
@@ -38,7 +40,7 @@ defmodule JyzBackendWeb.Router do
 
     get "/users", UserController, :index
     get "/users/:id", UserController, :show
-    post "/users", UserController, :new
+    
 
     get "/users/checkpwd/:pwd", UserController, :checkPassword
     get "/users/email/:email", UserController, :checkEmail

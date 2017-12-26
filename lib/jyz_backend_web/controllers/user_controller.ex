@@ -123,7 +123,8 @@ defmodule JyzBackendWeb.UserController do
               json conn, user |> Map.drop([:password, :password_hash])
             _avatar ->
               avatar = getAvatarUrl(user)
-              json conn, user |> Map.drop([:password, :password_hash]) |> Map.update!(:avatar, fn(_v) -> avatar end)
+              json conn, user |> Map.drop([:password, :password_hash]) 
+                              |> Map.update!(:avatar, fn(_v) -> avatar end)
           end
       end
     end
@@ -207,10 +208,14 @@ defmodule JyzBackendWeb.UserController do
     end
   
     # 获取用户头像url
-    defp getAvatarUrl(user) do
-      url = JyzBackendWeb.StringHandler.take_prefix(JyzBackend.Avatar.url({user.avatar, user}, :thumb),"/priv/static")
-      base = Application.get_env(:jyz_backend, JyzBackendWeb.Endpoint)[:baseurl]
-      base<>url
+    def getAvatarUrl(user) do
+      case user.avatar do
+        nil -> ""
+        avatar -> 
+          url = JyzBackendWeb.StringHandler.take_prefix(JyzBackend.Avatar.url({avatar, user}, :thumb),"/priv/static")
+          base = Application.get_env(:jyz_backend, JyzBackendWeb.Endpoint)[:baseurl]
+          base<>url
+      end
     end
   
     
