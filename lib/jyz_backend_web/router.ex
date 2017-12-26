@@ -20,6 +20,11 @@ defmodule JyzBackendWeb.Router do
     
     post "/login", LoginController, :login
 
+    # 自定义token验证
+    post "/users/avatar/upload/:token", UserController, :setAvatar
+
+    
+
     
 
   end
@@ -41,7 +46,9 @@ defmodule JyzBackendWeb.Router do
    
     post "/users/changepwd/:pwd", UserController, :changePassword
 
-    post "/users/avatar/upload", UserController, :setAvatar
+    
+
+   
 
     # 查看库存变化量
     get "/stock_change", StockChangeController, :index

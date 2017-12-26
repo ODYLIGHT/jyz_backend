@@ -16,13 +16,15 @@ defmodule JyzBackend.Avatar do
       # ~w(.jpg .jpeg .gif .png) |> Enum.member?(Path.extname(file.file_name))
     end
 
-    def transform(:original, _) do
-      Base.decode64!(:original)
-    end
+    # def transform(:original, _) do
+    #   # Base.decode64!(:original)
+    # end
   
     # Define a thumbnail transformation:
     # def transform(:thumb, _) do
-    #   {:convert, "-strip -thumbnail 250x250^ -gravity center -extent 250x250 -format png", :png}
+    #   # example: System.cmd "convert", ["inline:input.base64"," output.jpeg"]
+    #   # {:convert, "-strip -thumbnail 250x250^ -gravity center -extent 250x250 -format png", :png}
+    #   {:convert, fn(input, output) -> "inline:#{input} #{output}" end}
     # end
   
     # Override the persisted filenames:

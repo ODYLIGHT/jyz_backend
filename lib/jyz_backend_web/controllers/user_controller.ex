@@ -160,10 +160,11 @@ defmodule JyzBackendWeb.UserController do
     end
   
     # 上传用户头像图片文件
-    def setAvatar(conn,  %{"avatar" => avatar_params}) do
+    def setAvatar(conn,  %{"avatar" => avatar_params, "token" => token}) do
       # 判断是否具备权限
       # checkperm = Permissions.hasAllPermissions(conn, [:user_about_me])
-      user = Guardian.resource_from_conn(conn)
+      { :ok, user } = Guardian.get_user_from_token(token)
+      # user = UserService.getById(1)
       case { true, user} do
         { false, _} ->
           json conn, %{error: "Unauthorized operation."}
